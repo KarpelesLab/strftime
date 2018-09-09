@@ -40,6 +40,9 @@ This version of strftime for Go has multiple goals in mind:
 | %d      | day of the month as a decimal number (01-31) |
 | %e      | the day of the month as a decimal number (1-31); single digits are preceded by a blank |
 | %F      | equivalent to %Y-%m-%d |
+| %f      | Microseconds (6 digits) |
+| %G      | Year matching the week going by ISO-8601:1988 standards |
+| %g      | Two digits representation of %G |
 | %H      | the hour (24-hour clock) as a decimal number (00-23) |
 | %h      | same as %b |
 | %I      | the hour (12-hour clock) as a decimal number (01-12) |
@@ -50,9 +53,11 @@ This version of strftime for Go has multiple goals in mind:
 | %m      | the month as a decimal number (01-12) |
 | %n      | a newline |
 | %p      | national representation of either "ante meridiem" (a.m.)  or "post meridiem" (p.m.)  as appropriate. |
+| %P      | lower-case version of %p |
 | %R      | equivalent to %H:%M |
 | %r      | equivalent to %I:%M:%S %p |
 | %S      | the second as a decimal number (00-60) |
+| %s      | Unix Epoch Time timestamp (seconds since January 1st 1970) |
 | %T      | equivalent to %H:%M:%S |
 | %t      | a tab |
 | %U      | the week number of the year (Sunday as the first day of the week) as a decimal number (00-53) |
