@@ -73,6 +73,8 @@ var jpUnits = [...]struct {
 	U string
 	V uint
 }{
+	//{"兆", 1000000000000},
+	{"億", 100000000},
 	{"万", 10000},
 	{"千", 1000},
 	{"百", 100},
@@ -94,7 +96,9 @@ func strftimeJapaneseDigit(b []byte, v int) []byte {
 	for _, unit := range jpUnits {
 		if u >= unit.V {
 			n := u / unit.V
-			if n > 1 {
+			if n >= 10 {
+				b = strftimeJapaneseDigit(b, int(n))
+			} else if n > 1 {
 				b = append(b, []byte(jpDigits[n])...)
 			}
 			b = append(b, []byte(unit.U)...)

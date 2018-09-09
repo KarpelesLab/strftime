@@ -100,8 +100,7 @@ func TestValues(t *testing.T) {
 		{`%c %w %W %g %G %U`, `Sun Nov 24 17:31:45 1833 0 46 33 1833 47`, time.Unix(-0xffffffff, 0)},
 		{`%c %w %W %g %G %U`, `Mon Jan  1 00:00:00 1 1 01 01 1 00`, time.Unix(-62135596800, 0)},
 		{`%c %w %W %g %G %U`, `Fri Jan  7 00:00:00 0 5 01 00 0 01`, time.Unix(-62166700800, 0)},
-		// Go's ISO years won't work for negative years
-		{`%c %w %W %U`, `Sat Jan  1 00:00:00 0 6 00 00`, time.Unix(-62167219200, 0)},
+		{`%c %w %W %g %G %U`, `Sat Jan  1 00:00:00 0 6 00 -01 -1 00`, time.Unix(-62167219200, 0)},
 	}
 
 	for _, x := range cmp {
