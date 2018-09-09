@@ -1,6 +1,6 @@
 language: go
 sudo: false
-script: make install test
+script: make testdeps test
 go:
   - "1.8"
   - "1.10"

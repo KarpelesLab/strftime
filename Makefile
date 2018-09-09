@@ -1,7 +1,7 @@
 #!/bin/make
 GOPATH:=$(shell go env GOPATH)
 
-.PHONY: test bench
+.PHONY: deps testdeps test bench
 
 all:
 	$(GOPATH)/bin/goimports -w -l .
@@ -13,5 +13,8 @@ test:
 bench:
 	go test -tags bench -benchmem -bench .
 
-install:
+deps:
 	go get ./...
+
+testdeps:
+	go get -t ./...
