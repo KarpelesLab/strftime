@@ -89,6 +89,17 @@ This version of strftime for Go has multiple goals in mind:
 | %z      | the time zone offset from UTC |
 | %%      | a '%' |
 
+Era modifiers are available. For locales in which there is no era, normal values (without era modifier) are returned.
+
+| pattern | description |
+|:--------|:------------|
+| %Ec     | national representation of time and date |
+| %EC     | name of era the date is in |
+| %EX     | national representation of the time |
+| %Ex     | national representation of the date |
+| %EY     | full era name and year represented in locale |
+| %Ey     | year as decimal number in era (if any) or same as %y |
+
 ## Performances / other libraries
 
 ```

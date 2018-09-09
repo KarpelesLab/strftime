@@ -67,6 +67,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 				b.WriteRune(r)
 			}
 		case 'O':
+			// alternative digits output (japanese, etc)
 			switch r {
 			case 'd': // day (two decimals)
 				if l.Oprint != nil {
