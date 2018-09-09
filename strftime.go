@@ -175,9 +175,9 @@ func strftimeInternal(l *strftimeLocaleInfo, b *strings.Builder, f string, t tim
 			prevPercent = 'O'
 		case 'p':
 			if t.Hour() >= 12 {
-				b.WriteString(l.AmPm[1])
+				b.WriteString(strings.ToUpper(l.AmPm[1]))
 			} else {
-				b.WriteString(l.AmPm[0])
+				b.WriteString(strings.ToUpper(l.AmPm[0]))
 			}
 		case 'P':
 			if t.Hour() >= 12 {
