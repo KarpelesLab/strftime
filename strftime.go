@@ -88,6 +88,60 @@ func (obj *Formatter) FormatF(o io.Writer, f string, t time.Time) error {
 	}
 }
 
+func writeInt(w io.Writer, x int, width int) error {
+	u := uint(x)
+	var buf [20]byte
+	i := len(buf)
+
+	// Assemble decimal in reverse order.
+	for u >= 10 {
+		i--
+		q := u / 10
+		buf[i] = byte('0' + u - q*10)
+		u = q
+	}
+	i--
+	buf[i] = byte('0' + u)
+
+	// Add 0-padding.
+	for w := len(buf) - i; w < width; w++ {
+		i--
+		buf[i] = '0'
+	}
+
+	if x < 0 {
+		i--
+		buf[i] = '-'
+	}
+
+	_, err := w.Write(buf[i:])
+	return err
+}
+
+func writeUint8(w io.Writer, u uint8, width int) error {
+	var buf [3]byte
+	i := len(buf)
+
+	// Assemble decimal in reverse order.
+	for u >= 10 {
+		i--
+		q := u / 10
+		buf[i] = byte('0' + u - q*10)
+		u = q
+	}
+	i--
+	buf[i] = byte('0' + u)
+
+	// Add 0-padding.
+	for w := len(buf) - i; w < width; w++ {
+		i--
+		buf[i] = '0'
+	}
+
+	_, err := w.Write(buf[i:])
+	return err
+}
+
 func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.Time) {
 	prevPercent := rune(0)
 
@@ -128,7 +182,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Day()))
 			} else {
-				fmt.Fprintf(b, "%02d", t.Day())
+				writeUint8(b, uint8(t.Day()), 2)
 			}
 		case 'D': // date (month/day/year format)
 			strftimeInternal(l, b, "%m/%d/%y", t)
@@ -141,20 +195,20 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 		case 'E':
 			prevPercent = 'E'
 		case 'f':
-			fmt.Fprintf(b, "%06d", t.Nanosecond()/1000)
+			writeInt(b, t.Nanosecond()/1000, 6)
 		case 'F':
 			strftimeInternal(l, b, "%Y-%m-%d", t)
 		case 'g':
 			y, _ := t.ISOWeek()
-			fmt.Fprintf(b, "%d", y%100)
+			writeInt(b, y%100, 1)
 		case 'G':
 			y, _ := t.ISOWeek()
-			fmt.Fprintf(b, "%d", y)
+			writeInt(b, y, 1)
 		case 'H':
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Hour()))
 			} else {
-				fmt.Fprintf(b, "%02d", t.Hour())
+				writeUint8(b, uint8(t.Hour()), 2)
 			}
 		case 'I':
 			// Noon is 12PM, midnight is 12AM.
@@ -165,10 +219,10 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(h))
 			} else {
-				fmt.Fprintf(b, "%02d", h)
+				writeUint8(b, uint8(h), 2)
 			}
 		case 'j':
-			fmt.Fprintf(b, "%03d", t.YearDay())
+			writeInt(b, t.YearDay(), 3)
 		case 'k':
 			fmt.Fprintf(b, "%2d", t.Hour())
 		case 'l':
@@ -182,13 +236,13 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(int(t.Month())))
 			} else {
-				fmt.Fprintf(b, "%02d", t.Month())
+				writeUint8(b, uint8(t.Month()), 2)
 			}
 		case 'M':
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Minute()))
 			} else {
-				fmt.Fprintf(b, "%02d", t.Minute())
+				writeUint8(b, uint8(t.Minute()), 2)
 			}
 		case 'n':
 			b.WriteByte('\n')
@@ -216,7 +270,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Second()))
 			} else {
-				fmt.Fprintf(b, "%02d", t.Second())
+				writeUint8(b, uint8(t.Second()), 2)
 			}
 		case 't':
 			b.WriteByte('\t')
@@ -234,7 +288,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint((((t.YearDay() - 1) - int(t.Weekday()) + 7) / 7)))
 			} else {
-				fmt.Fprintf(b, "%02d", ((t.YearDay()-1)-int(t.Weekday())+7)/7)
+				writeUint8(b, uint8(((t.YearDay()-1)-int(t.Weekday())+7)/7), 2)
 			}
 		case 'v': // non-standard extension found in https://github.com/lestrrat-go/strftime
 			strftimeInternal(l, b, "%e-%b-%Y", t)
@@ -243,7 +297,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(w))
 			} else {
-				fmt.Fprintf(b, "%02d", w)
+				writeUint8(b, uint8(w), 2)
 			}
 		case 'w':
 			if thisPercent == 'O' && l.Oprint != nil {
@@ -257,7 +311,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(((t.YearDay() - 1) - wday + 7) / 7))
 			} else {
-				fmt.Fprintf(b, "%02d", ((t.YearDay()-1)-wday+7)/7)
+				writeUint8(b, uint8(((t.YearDay()-1)-wday+7)/7), 2)
 			}
 		case 'x':
 			if thisPercent == 'E' && l.DfmtEra != "" {
@@ -277,7 +331,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			} else if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Year() % 100))
 			} else {
-				fmt.Fprintf(b, "%02d", t.Year()%100)
+				writeInt(b, t.Year()%100, 2)
 			}
 		case 'Y':
 			if thisPercent == 'E' && l.Eyear != nil {
@@ -294,7 +348,8 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			} else {
 				b.WriteByte('+')
 			}
-			fmt.Fprintf(b, "%02d%02d", z/60, z%60)
+			writeUint8(b, uint8(z/60), 2)
+			writeUint8(b, uint8(z%60), 2)
 		case 'Z':
 			n, _ := t.Zone()
 			b.WriteString(n)
