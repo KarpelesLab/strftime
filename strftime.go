@@ -21,7 +21,7 @@ func Format(l language.Tag, f string, t time.Time) string {
 	if !ok {
 		// need to match locale
 		_, i, _ := strftimeLocaleMatcher.Match(l)
-		locale = strftimeLocaleTable[strftimeLocaleTags[i]]
+		locale = strftimeLocales[i]
 	}
 	b := &bytes.Buffer{}
 	strftimeInternal(locale, b, f, t)
@@ -52,7 +52,7 @@ func New(l ...language.Tag) *Formatter {
 	}
 	// need to match locale
 	_, i, _ := strftimeLocaleMatcher.Match(l...)
-	locale := strftimeLocaleTable[strftimeLocaleTags[i]]
+	locale := strftimeLocales[i]
 
 	return &Formatter{locale}
 }

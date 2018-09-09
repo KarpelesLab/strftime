@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+
+	"golang.org/x/text/language"
 )
 
 var japaneseLocale = &strftimeLocaleInfo{
+	tag:      language.Japanese,
 	DTfmt:    "%Y年%m月%d日 %H時%M分%S秒",
 	Dfmt:     "%Y年%m月%d日",
 	Tfmt:     "%H時%M分%S秒",

@@ -85,3 +85,21 @@ func TestJapanese(t *testing.T) {
 		assert.Equal(t, x.B, f.Format(x.A, x.T), `matching for `+x.A)
 	}
 }
+
+func TestLocale(t *testing.T) {
+	var ref = time.Unix(1136239445, 456841962).UTC()
+
+	cmp := []struct{ A, B string }{
+		{`nn;q=0.3, en-us;q=0.8, en,`, `Mon Jan  2 22:04:05 2006`},
+		{`gsw, en;q=0.7, en-US;q=0.8`, `Mon Jan  2 22:04:05 2006`},
+		{`gsw, nl, da`, `ma 02 jan 2006 22:04:05 UTC`},
+		{`fr`, `lun. 02 janv. 2006 22:04:05 UTC`},
+		{`invalid`, `Mon Jan  2 22:04:05 2006`},
+	}
+
+	for _, x := range cmp {
+		tags, _, _ := language.ParseAcceptLanguage(x.A)
+		f := strftime.New(tags...)
+		assert.Equal(t, x.B, f.Format(`%c`, ref), `language detect for `+x.A)
+	}
+}

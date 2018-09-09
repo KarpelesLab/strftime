@@ -7,6 +7,8 @@ import (
 )
 
 type strftimeLocaleInfo struct {
+	tag language.Tag
+
 	DTfmt  string // %c
 	Dfmt   string // %x
 	Tfmt   string // %X
@@ -30,20 +32,26 @@ type strftimeLocaleInfo struct {
 	Month   [12]string
 }
 
-var strftimeLocaleTags []language.Tag
+var (
+	strftimeLocaleMatcher language.Matcher
+	strftimeLocaleTable   map[language.Tag]*strftimeLocaleInfo
+)
 
-// build strftimeLocaleMatcher only once
-var strftimeLocaleMatcher = func() language.Matcher {
-	strftimeLocaleTags = make([]language.Tag, len(strftimeLocaleTable))
-	n := int(0)
-	for tag, _ := range strftimeLocaleTable {
-		strftimeLocaleTags[n] = tag
-		n += 1
+func init() {
+	// initialize and fill the variables
+	strftimeLocaleTable = make(map[language.Tag]*strftimeLocaleInfo)
+	matcherTable := make([]language.Tag, len(strftimeLocales))
+
+	for i, loc := range strftimeLocales {
+		strftimeLocaleTable[loc.tag] = loc
+		matcherTable[i] = loc.tag
 	}
-	return language.NewMatcher(strftimeLocaleTags)
-}()
+
+	strftimeLocaleMatcher = language.NewMatcher(matcherTable)
+}
 
 var englishLocale = &strftimeLocaleInfo{
+	tag:    language.English,
 	DTfmt:  "%a %b %e %H:%M:%S %Y",
 	Dfmt:   "%m/%d/%y",
 	Tfmt:   "%H:%M:%S",
@@ -56,9 +64,10 @@ var englishLocale = &strftimeLocaleInfo{
 	Month:   [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"},
 }
 
-var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
-	language.English: englishLocale,
-	language.AmericanEnglish: &strftimeLocaleInfo{
+var strftimeLocales = [...]*strftimeLocaleInfo{
+	englishLocale,
+	&strftimeLocaleInfo{
+		tag:    language.AmericanEnglish,
 		DTfmt:  "%a %b %e %H:%M:%S %Y",
 		Dfmt:   "%m/%d/%Y",
 		Tfmt:   "%H:%M:%S",
@@ -70,7 +79,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
 		Month:   [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"},
 	},
-	language.BritishEnglish: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:    language.BritishEnglish,
 		DTfmt:  "%a %d %b %Y %T %Z",
 		Dfmt:   "%m/%d/%y",
 		Tfmt:   "%T",
@@ -82,7 +92,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
 		Month:   [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"},
 	},
-	language.Spanish: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:   language.Spanish,
 		DTfmt: "%a %d %b %Y %T %Z",
 		Dfmt:  "%d/%m/%y",
 		Tfmt:  "%T",
@@ -92,7 +103,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"},
 		Month:   [12]string{"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"},
 	},
-	language.German: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:   language.German,
 		DTfmt: "%a %d %b %Y %T %Z",
 		Dfmt:  "%d.%m.%Y",
 		Tfmt:  "%T",
@@ -102,7 +114,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"},
 		Month:   [12]string{"Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"},
 	},
-	language.French: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:   language.French,
 		DTfmt: "%a %d %b %Y %T %Z",
 		Dfmt:  "%d/%m/%Y",
 		Tfmt:  "%T",
@@ -112,7 +125,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"janv.", "févr.", "mars", "avril", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."},
 		Month:   [12]string{"janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"},
 	},
-	language.Italian: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:   language.Italian,
 		DTfmt: "%a %d %b %Y %T %Z",
 		Dfmt:  "%d/%m/%Y",
 		Tfmt:  "%T",
@@ -122,7 +136,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"},
 		Month:   [12]string{"gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"},
 	},
-	language.Dutch: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:   language.Dutch,
 		DTfmt: "%a %d %b %Y %T %Z",
 		Dfmt:  "%d-%m-%y",
 		Tfmt:  "%T",
@@ -132,7 +147,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"},
 		Month:   [12]string{"januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"},
 	},
-	language.Polish: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:   language.Polish,
 		DTfmt: "%a, %-d %b %Y, %T",
 		Dfmt:  "%d.%m.%Y",
 		Tfmt:  "%T",
@@ -142,7 +158,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"},
 		Month:   [12]string{"styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"},
 	},
-	language.Portuguese: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:   language.Portuguese,
 		DTfmt: "%a %d %b %Y %T %Z",
 		Dfmt:  "%d-%m-%Y",
 		Tfmt:  "%T",
@@ -152,7 +169,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"},
 		Month:   [12]string{"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"},
 	},
-	language.Russian: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:   language.Russian,
 		DTfmt: "%a %d %b %Y %T",
 		Dfmt:  "%d.%m.%Y",
 		Tfmt:  "%T",
@@ -162,7 +180,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"},
 		Month:   [12]string{"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"},
 	},
-	language.Thai: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:      language.Thai,
 		DTfmt:    "%a %e %b %Ey, %H:%M:%S",
 		Dfmt:     "%d/%m/%Ey",
 		Tfmt:     "%H:%M:%S",
@@ -171,14 +190,15 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		DfmtEra:  "%e %b %Ey",
 		TfmtEra:  "%H.%M.%S น.",
 		AmPm:     [2]string{"AM", "PM"},
-		// TODO: that era handling
+		// TODO: thai era handling
 
 		AbDay:   [7]string{"อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."},
 		Day:     [7]string{"อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"},
 		AbMonth: [12]string{"ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."},
 		Month:   [12]string{"มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"},
 	},
-	language.Korean: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:    language.Korean,
 		DTfmt:  "%x (%a) %r",
 		Dfmt:   "%Y년 %m월 %d일",
 		Tfmt:   "%H시 %M분 %S초",
@@ -190,9 +210,10 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{" 1월", " 2월", " 3월", " 4월", " 5월", " 6월", " 7월", " 8월", " 9월", "10월", "11월", "12월"},
 		Month:   [12]string{"1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"},
 	},
-	language.Japanese: japaneseLocale,
+	japaneseLocale,
 	// only character for "hour" changes between Simplified Chinese(时) and Traditional Chinese(時)
-	language.SimplifiedChinese: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:    language.SimplifiedChinese,
 		DTfmt:  "%Y年%m月%d日 %A %H时%M分%S秒",
 		Dfmt:   "%Y年%m月%d日",
 		Tfmt:   "%H时%M分%S秒",
@@ -204,7 +225,8 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
 		Month:   [12]string{"一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"},
 	},
-	language.TraditionalChinese: &strftimeLocaleInfo{
+	&strftimeLocaleInfo{
+		tag:    language.TraditionalChinese,
 		DTfmt:  "%Y年%m月%d日 (%A) %H時%M分%S秒",
 		Dfmt:   "%Y年%m月%d日",
 		Tfmt:   "%H時%M分%S秒",
