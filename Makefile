@@ -8,7 +8,10 @@ all:
 	go build -v
 
 test:
-	go test
+	go test ./...
 
 bench:
 	go test -tags bench -benchmem -bench .
+
+install:
+	go get ./...
