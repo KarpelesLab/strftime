@@ -13,6 +13,7 @@ type Formatter struct {
 	l *strftimeLocaleInfo
 }
 
+// Format will format the time t following strftime format specified in f using language l.
 func Format(l language.Tag, f string, t time.Time) string {
 	locale, ok := strftimeLocaleTable[l]
 	if !ok {
@@ -33,6 +34,7 @@ func Format(l language.Tag, f string, t time.Time) string {
 	return b.String()
 }
 
+// FormatUS formats time t using format f and US locale.
 func FormatUS(f string, t time.Time) string {
 	b := strings.Builder{}
 	strftimeInternal(usLocale, &b, f, t)
