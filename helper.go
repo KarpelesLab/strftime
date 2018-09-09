@@ -4,7 +4,7 @@ import "io"
 
 func writeInt(w io.Writer, x int, width int) error {
 	u := uint(x)
-	var buf [20]byte
+	var buf [21]byte
 	i := len(buf)
 
 	// Assemble decimal in reverse order.
