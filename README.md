@@ -1,13 +1,13 @@
 # strftime
 
-strftime in Go, with locale support
+strftime in Go, with BCP 47 language tags support via Go's golang.org/x/text/language
 
 [![GoDoc](https://godoc.org/github.com/MagicalTux/strftime?status.svg)](https://godoc.org/github.com/MagicalTux/strftime)
 
 # Usage
 
 ```go
-f := strftime.New(locale.French)
+f := strftime.New(language.French)
 out.WriteString(f.Format(`pattern`, time.Now()));
 ```
 
