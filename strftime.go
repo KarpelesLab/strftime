@@ -1,8 +1,6 @@
 package strftime
 
 import (
-	"bufio"
-	"bytes"
 	"io"
 	"time"
 
@@ -23,10 +21,9 @@ func Format(l language.Tag, f string, t time.Time) string {
 		_, i, _ := strftimeLocaleMatcher.Match(l)
 		locale = strftimeLocales[i]
 	}
-	b := &bytes.Buffer{}
-	strftimeInternal(locale, b, f, t)
+	b := strftimeAppend(locale, nil, []byte(f), t)
 
-	return b.String()
+	return string(b)
 }
 
 // EnFormat formats time t using format f and English locale.
@@ -59,21 +56,15 @@ func New(l ...language.Tag) *Formatter {
 
 // Format formats time using provided format, and returns a string.
 func (obj *Formatter) Format(f string, t time.Time) string {
-	b := &bytes.Buffer{}
-	strftimeInternal(obj.l, b, f, t)
+	b := strftimeAppend(obj.l, nil, []byte(f), t)
 
-	return b.String()
+	return string(b)
 }
 
 // FormatF formats time using provided format, and outputs it to the provided io.Writer.
 func (obj *Formatter) FormatF(o io.Writer, f string, t time.Time) error {
-	if b, ok := o.(strftimeWriter); ok {
-		// output implements the necessary methods to write runes & strings
-		strftimeInternal(obj.l, b, f, t)
-		return nil
-	} else {
-		w := bufio.NewWriter(o)
-		strftimeInternal(obj.l, w, f, t)
-		return w.Flush()
-	}
+	// output implements the necessary methods to write runes & strings
+	b := strftimeAppend(obj.l, nil, []byte(f), t)
+	_, err := o.Write(b)
+	return err
 }

@@ -1,43 +1,15 @@
 package strftime
 
-import "io"
-
-func writeInt(w io.Writer, x int, width int) error {
+func appendInt(b []byte, x int, width int) []byte {
 	u := uint(x)
-	var buf [21]byte
-	i := len(buf)
-
-	// Assemble decimal in reverse order.
-	for u >= 10 {
-		i--
-		q := u / 10
-		buf[i] = byte('0' + u - q*10)
-		u = q
-	}
-	i--
-	buf[i] = byte('0' + u)
-
-	// Add 0-padding.
-	for w := len(buf) - i; w < width; w++ {
-		i--
-		buf[i] = '0'
-	}
-
 	if x < 0 {
-		i--
-		buf[i] = '-'
+		b = append(b, '-')
+		u = uint(-x)
 	}
 
-	_, err := w.Write(buf[i:])
-	return err
-}
-
-// optimized writeInt for unsigned values below 256
-func writeUint8(w io.Writer, u uint8, width int) error {
-	var buf [3]byte
-	i := len(buf)
-
 	// Assemble decimal in reverse order.
+	var buf [20]byte
+	i := len(buf)
 	for u >= 10 {
 		i--
 		q := u / 10
@@ -49,20 +21,22 @@ func writeUint8(w io.Writer, u uint8, width int) error {
 
 	// Add 0-padding.
 	for w := len(buf) - i; w < width; w++ {
-		i--
-		buf[i] = '0'
+		b = append(b, '0')
 	}
 
-	_, err := w.Write(buf[i:])
-	return err
+	return append(b, buf[i:]...)
 }
 
-// version with space padding
-func writeUint8Sp(w io.Writer, u uint8, width int) error {
-	var buf [3]byte
-	i := len(buf)
+func appendInt64(b []byte, x int64, width int) []byte {
+	u := uint64(x)
+	if x < 0 {
+		b = append(b, '-')
+		u = uint64(-x)
+	}
 
 	// Assemble decimal in reverse order.
+	var buf [20]byte
+	i := len(buf)
 	for u >= 10 {
 		i--
 		q := u / 10
@@ -74,10 +48,50 @@ func writeUint8Sp(w io.Writer, u uint8, width int) error {
 
 	// Add 0-padding.
 	for w := len(buf) - i; w < width; w++ {
-		i--
-		buf[i] = ' '
+		b = append(b, '0')
 	}
 
-	_, err := w.Write(buf[i:])
-	return err
+	return append(b, buf[i:]...)
+}
+
+func appendUint8(b []byte, u uint8, width int) []byte {
+	// Assemble decimal in reverse order.
+	var buf [3]byte
+	i := len(buf)
+	for u >= 10 {
+		i--
+		q := u / 10
+		buf[i] = byte('0' + u - q*10)
+		u = q
+	}
+	i--
+	buf[i] = byte('0' + u)
+
+	// Add 0-padding.
+	for w := len(buf) - i; w < width; w++ {
+		b = append(b, '0')
+	}
+
+	return append(b, buf[i:]...)
+}
+
+func appendUint8Sp(b []byte, u uint8, width int) []byte {
+	// Assemble decimal in reverse order.
+	var buf [3]byte
+	i := len(buf)
+	for u >= 10 {
+		i--
+		q := u / 10
+		buf[i] = byte('0' + u - q*10)
+		u = q
+	}
+	i--
+	buf[i] = byte('0' + u)
+
+	// Add space-padding.
+	for w := len(buf) - i; w < width; w++ {
+		b = append(b, ' ')
+	}
+
+	return append(b, buf[i:]...)
 }

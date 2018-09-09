@@ -25,8 +25,8 @@ type strftimeLocaleInfo struct {
 	Day   [7]string
 
 	// functions for extended %O(x) and %E(x)
-	Oprint func(int) string
-	Eyear  func(time.Time, rune) string // rune can be 'C', 'y' or 'Y'
+	Oprint func([]byte, int) []byte
+	Eyear  func(time.Time, byte) string // byte can be 'C', 'y' or 'Y'
 
 	AbMonth [12]string
 	Month   [12]string

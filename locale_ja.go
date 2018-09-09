@@ -26,7 +26,7 @@ var japaneseLocale = &strftimeLocaleInfo{
 }
 
 // TODO need something more generic for era
-func strftimeJapaneseEra(t time.Time, r rune) string {
+func strftimeJapaneseEra(t time.Time, r byte) string {
 	era := "西暦"
 	y, m, d := t.Date()
 
