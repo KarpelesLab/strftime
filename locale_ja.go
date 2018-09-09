@@ -69,7 +69,15 @@ func strftimeJapaneseEra(t time.Time, r byte) string {
 }
 
 var jpDigits = [...]string{"〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"}
-var jpDozens = [...]string{"十", "百", "千", "万"}
+var jpUnits = [...]struct {
+	U string
+	V uint
+}{
+	{"万", 10000},
+	{"千", 1000},
+	{"百", 100},
+	{"十", 10},
+}
 
 // strftimeJapaneseDigit converts value v into string representation using unicode japanese characters.
 // this will usually never receive a value over 100
@@ -83,24 +91,16 @@ func strftimeJapaneseDigit(b []byte, v int) []byte {
 
 	appd := false
 
-	if u >= 100 {
-		n := u / 100
-		if n > 1 {
-			b = append(b, []byte(jpDigits[n])...)
+	for _, unit := range jpUnits {
+		if u >= unit.V {
+			n := u / unit.V
+			if n > 1 {
+				b = append(b, []byte(jpDigits[n])...)
+			}
+			b = append(b, []byte(unit.U)...)
+			u = u - (n * unit.V)
+			appd = true
 		}
-		b = append(b, []byte(jpDozens[1])...)
-		u = u - (n * 100)
-		appd = true
-	}
-
-	if u >= 10 {
-		n := u / 10
-		if n > 1 {
-			b = append(b, []byte(jpDigits[n])...)
-		}
-		b = append(b, []byte(jpDozens[0])...)
-		u = u - (n * 10)
-		appd = true
 	}
 
 	if u > 0 || !appd {
