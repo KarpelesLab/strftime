@@ -1,6 +1,6 @@
 language: go
 sudo: false
-script: make test
+script: make install test
 go:
   - "1.8"
   - "1.10"
