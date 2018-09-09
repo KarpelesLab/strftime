@@ -100,6 +100,12 @@ Era modifiers are available. For locales in which there is no era, normal values
 | %EY     | full era name and year represented in locale |
 | %Ey     | year as decimal number in era (if any) or same as %y |
 
+## Why not Go's Format()?
+
+This is a very good question. Go time package's [`Format()`](https://golang.org/pkg/time/#Time.Format) method has a nice, human friendly method to set the format for a date. Yet, this is unfortunately not appropriate when multiple languages are involved, as each language has its own rules in terms of terms ordering and presentation, and may even use different years.
+
+While maybe less human friendly, `strftime()` has a long history and most developers will know how it works and what to expect from it.
+
 ## Performances / other libraries
 
 ```
