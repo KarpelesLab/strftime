@@ -64,7 +64,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			strftimeInternal(l, b, "%Y-%m-%d", t)
 		case 'g':
 			y, _ := t.ISOWeek()
-			writeInt(b, y%100, 1)
+			writeInt(b, y%100, 2)
 		case 'G':
 			y, _ := t.ISOWeek()
 			writeInt(b, y, 1)
