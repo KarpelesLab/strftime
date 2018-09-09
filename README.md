@@ -8,7 +8,7 @@ Fast strftime in Go with [BCP 47 language tags](https://golang.org/x/text/langua
 
 # Usage
 
-It is either possible to instanciate an object for a given locale (via `strftime.New`) or directly call strftime.Format().
+It is either possible to instanciate an object for a given locale (via `strftime.New`) or directly call `strftime.Format` or `strftime.EnFormat`.
 
 ## Examples
 
@@ -132,10 +132,3 @@ This library is much faster than other libraries for common cases. In case of fo
 
 Please note that this benchmark only uses the subset of conversion specifications that are supported by *ALL* of the libraries compared.
 
-## Internals
-
-This strftime implementation works by writing to a io.Writer by default. If using Format instead of FormatF, it will write internally to a buffer, which is then returned as string.
-
-Go provides two methods to accomplish this starting go 1.10: bytes.Buffer (available in earlier versions) or the new strings.Builder. In go 1.10 strings.Builder is still a bit slow, bug go 1.11 benchmark gets much closer to bytes.Buffer, with slightly less memory usage (208 B/op with strings.Builder vs 227 B/op with bytes.Buffer).
-
-Because of this, it has been decided to stay with bytes.Buffer for now, but tests will have to be run again with new Go versions.

@@ -31,6 +31,8 @@ func strftimeJapaneseEra(t time.Time, r byte) string {
 	y, m, d := t.Date()
 
 	switch {
+	case (y > 2019) || ((y == 2019) && (m > 5)) || ((y == 2019) && (m == 5) && (d >= 1)):
+		// ??? era
 	case (y > 1989) || ((y == 1989) && (m > 1)) || ((y == 1989) && (m == 1) && (d >= 8)):
 		// Heisei era
 		era = "平成"

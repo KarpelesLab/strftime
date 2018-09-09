@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func strftimeAppend(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []byte {
+func appendStrftime(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []byte {
 	skip := 0
 
 	for len(f) > 0 {
@@ -39,9 +39,9 @@ func strftimeAppend(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []by
 			switch f[2] {
 			case 'c':
 				if l.DTfmtEra != "" {
-					b = strftimeAppend(l, b, []byte(l.DTfmtEra), t)
+					b = appendStrftime(l, b, []byte(l.DTfmtEra), t)
 				} else {
-					b = strftimeAppend(l, b, []byte(l.DTfmt), t)
+					b = appendStrftime(l, b, []byte(l.DTfmt), t)
 				}
 			case 'C':
 				if l.Eyear != nil {
@@ -51,15 +51,15 @@ func strftimeAppend(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []by
 				}
 			case 'x':
 				if l.DfmtEra != "" {
-					b = strftimeAppend(l, b, []byte(l.DfmtEra), t)
+					b = appendStrftime(l, b, []byte(l.DfmtEra), t)
 				} else {
-					b = strftimeAppend(l, b, []byte(l.Dfmt), t)
+					b = appendStrftime(l, b, []byte(l.Dfmt), t)
 				}
 			case 'X':
 				if l.TfmtEra != "" {
-					b = strftimeAppend(l, b, []byte(l.TfmtEra), t)
+					b = appendStrftime(l, b, []byte(l.TfmtEra), t)
 				} else {
-					b = strftimeAppend(l, b, []byte(l.Tfmt), t)
+					b = appendStrftime(l, b, []byte(l.Tfmt), t)
 				}
 			case 'y':
 				if l.Eyear != nil {
@@ -171,19 +171,19 @@ func strftimeAppend(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []by
 		case 'B': // month
 			b = append(b, []byte(l.Month[int(t.Month())-1])...)
 		case 'c': // date & time format
-			b = strftimeAppend(l, b, []byte(l.DTfmt), t)
+			b = appendStrftime(l, b, []byte(l.DTfmt), t)
 		case 'C': // century part of year
 			b = appendInt(b, t.Year()/100, 1)
 		case 'd': // day (two decimals)
 			b = appendUint8(b, uint8(t.Day()), 2)
 		case 'D': // date (month/day/year format)
-			b = strftimeAppend(l, b, []byte("%m/%d/%y"), t)
+			b = appendStrftime(l, b, []byte("%m/%d/%y"), t)
 		case 'e': // day
 			b = appendUint8Sp(b, uint8(t.Day()), 2)
 		case 'f':
 			b = appendInt(b, t.Nanosecond()/1000, 6)
 		case 'F':
-			b = strftimeAppend(l, b, []byte("%Y-%m-%d"), t)
+			b = appendStrftime(l, b, []byte("%Y-%m-%d"), t)
 		case 'g':
 			y, _ := t.ISOWeek()
 			b = appendInt(b, y%100, 2)
@@ -229,9 +229,9 @@ func strftimeAppend(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []by
 				b = append(b, []byte(strings.ToLower(l.AmPm[0]))...)
 			}
 		case 'r':
-			b = strftimeAppend(l, b, []byte("%I:%M:%S %p"), t)
+			b = appendStrftime(l, b, []byte("%I:%M:%S %p"), t)
 		case 'R':
-			b = strftimeAppend(l, b, []byte("%H:%M"), t)
+			b = appendStrftime(l, b, []byte("%H:%M"), t)
 		case 's':
 			b = appendInt64(b, t.Unix(), 1)
 		case 'S':
@@ -239,14 +239,14 @@ func strftimeAppend(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []by
 		case 't':
 			b = append(b, '\t')
 		case 'T':
-			b = strftimeAppend(l, b, []byte("%H:%M:%S"), t)
+			b = appendStrftime(l, b, []byte("%H:%M:%S"), t)
 		case 'u':
 			wday := (int(t.Weekday()+6) % 7) + 1 // weekday but Monday = 1
 			b = appendUint8(b, uint8(wday), 1)
 		case 'U':
 			b = appendUint8(b, uint8(((t.YearDay()-1)-int(t.Weekday())+7)/7), 2)
 		case 'v': // non-standard extension found in https://github.com/lestrrat-go/strftime
-			b = strftimeAppend(l, b, []byte("%e-%b-%Y"), t)
+			b = appendStrftime(l, b, []byte("%e-%b-%Y"), t)
 		case 'V':
 			_, w := t.ISOWeek()
 			b = appendUint8(b, uint8(w), 2)
@@ -256,9 +256,9 @@ func strftimeAppend(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []by
 			wday := int(t.Weekday()+6) % 7 // weekday but Monday = 0
 			b = appendUint8(b, uint8(((t.YearDay()-1)-wday+7)/7), 2)
 		case 'x':
-			b = strftimeAppend(l, b, []byte(l.Dfmt), t)
+			b = appendStrftime(l, b, []byte(l.Dfmt), t)
 		case 'X':
-			b = strftimeAppend(l, b, []byte(l.Tfmt), t)
+			b = appendStrftime(l, b, []byte(l.Tfmt), t)
 		case 'y':
 			b = appendInt(b, t.Year()%100, 2)
 		case 'Y':

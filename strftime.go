@@ -11,6 +11,7 @@ type Formatter struct {
 	l *strftimeLocaleInfo
 }
 
+// EnglishFormatter is pre-initialized English locale formatter.
 var EnglishFormatter = &Formatter{englishLocale}
 
 // Format is a shortcut to format a date in a given locale easily. Best performance is achieved by using language constants such as language.AmericanEnglish or language.French.
@@ -21,7 +22,7 @@ func Format(l language.Tag, f string, t time.Time) string {
 		_, i, _ := strftimeLocaleMatcher.Match(l)
 		locale = strftimeLocales[i]
 	}
-	b := strftimeAppend(locale, nil, []byte(f), t)
+	b := appendStrftime(locale, make([]byte, 0, 32+len(f)*2), []byte(f), t)
 
 	return string(b)
 }
@@ -56,20 +57,20 @@ func New(l ...language.Tag) *Formatter {
 
 // Format formats time using provided format, and returns a string.
 func (obj *Formatter) Format(f string, t time.Time) string {
-	b := strftimeAppend(obj.l, nil, []byte(f), t)
+	b := appendStrftime(obj.l, make([]byte, 0, 32+len(f)*2), []byte(f), t)
 
 	return string(b)
 }
 
 // AppendFormat is like Format but appends the textual representation to b and returns the extended buffer.
 func (obj *Formatter) AppendFormat(b []byte, f string, t time.Time) []byte {
-	return strftimeAppend(obj.l, b, []byte(f), t)
+	return appendStrftime(obj.l, b, []byte(f), t)
 }
 
 // FormatF formats time using provided format, and outputs it to the provided io.Writer.
 func (obj *Formatter) FormatF(o io.Writer, f string, t time.Time) error {
 	// output implements the necessary methods to write runes & strings
-	b := strftimeAppend(obj.l, nil, []byte(f), t)
+	b := appendStrftime(obj.l, make([]byte, 0, 32+len(f)*2), []byte(f), t)
 	_, err := o.Write(b)
 	return err
 }
