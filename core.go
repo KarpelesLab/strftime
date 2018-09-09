@@ -7,10 +7,10 @@ import (
 )
 
 func appendStrftime(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []byte {
-	skip := 0
+	var skip, i int
 
 	for len(f) > 0 {
-		i := bytes.IndexByte(f, '%')
+		i = bytes.IndexByte(f, '%')
 		if i > 0 {
 			b = append(b, f[:i]...)
 			f = f[i:]
@@ -92,7 +92,7 @@ func appendStrftime(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []by
 				v = uint8(t.Hour())
 			case 'I':
 				// Noon is 12PM, midnight is 12AM.
-				v := uint8(t.Hour() % 12)
+				v = uint8(t.Hour() % 12)
 				if v == 0 {
 					v = 12
 				}

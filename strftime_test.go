@@ -126,6 +126,25 @@ func TestJapanese(t *testing.T) {
 		{`%Ex`, `西暦1801年01月01日`, time.Unix(-5333126400, 0)},
 		{`%Ex`, `明治7年01月01日`, time.Unix(-3029443200, 0)},
 		{`%Ex`, `大正4年01月01日`, time.Unix(-1735689600, 0)},
+		{`%Oy`, `六`, ref},
+		{`%OH`, `二十二`, ref},
+		{`%OI`, `十`, ref},
+	}
+
+	for _, x := range cmp {
+		assert.Equal(t, x.B, f.Format(x.A, x.T.UTC()), `matching for `+x.A)
+	}
+}
+
+func TestFrench(t *testing.T) {
+	ref := time.Unix(1136239445, 456841962).UTC()
+	f := strftime.New(language.French)
+
+	cmp := []struct {
+		A, B string
+		T    time.Time
+	}{
+		{`%p %P`, ` `, ref},
 	}
 
 	for _, x := range cmp {

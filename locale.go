@@ -50,48 +50,10 @@ func init() {
 	strftimeLocaleMatcher = language.NewMatcher(matcherTable)
 }
 
-var englishLocale = &strftimeLocaleInfo{
-	tag:    language.English,
-	DTfmt:  "%a %b %e %H:%M:%S %Y",
-	Dfmt:   "%m/%d/%y",
-	Tfmt:   "%H:%M:%S",
-	Tfmt12: "%I:%M:%S %p",
-	AmPm:   [2]string{"AM", "PM"},
-
-	AbDay:   [7]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"},
-	Day:     [7]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-	AbMonth: [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
-	Month:   [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"},
-}
-
 var strftimeLocales = [...]*strftimeLocaleInfo{
 	englishLocale,
-	&strftimeLocaleInfo{
-		tag:    language.AmericanEnglish,
-		DTfmt:  "%a %b %e %H:%M:%S %Y",
-		Dfmt:   "%m/%d/%Y",
-		Tfmt:   "%H:%M:%S",
-		Tfmt12: "%I:%M:%S %p",
-		AmPm:   [2]string{"AM", "PM"},
-
-		AbDay:   [7]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"},
-		Day:     [7]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-		AbMonth: [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
-		Month:   [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"},
-	},
-	&strftimeLocaleInfo{
-		tag:    language.BritishEnglish,
-		DTfmt:  "%a %d %b %Y %T %Z",
-		Dfmt:   "%m/%d/%y",
-		Tfmt:   "%T",
-		Tfmt12: "%l:%M:%S %P %Z",
-		AmPm:   [2]string{"am", "pm"},
-
-		AbDay:   [7]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"},
-		Day:     [7]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
-		AbMonth: [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
-		Month:   [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"},
-	},
+	americanEnglishLocale,
+	britishEnglishLocale,
 	&strftimeLocaleInfo{
 		tag:   language.Spanish,
 		DTfmt: "%a %d %b %Y %T %Z",
@@ -211,31 +173,6 @@ var strftimeLocales = [...]*strftimeLocaleInfo{
 		Month:   [12]string{"1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"},
 	},
 	japaneseLocale,
-	// only character for "hour" changes between Simplified Chinese(时) and Traditional Chinese(時)
-	&strftimeLocaleInfo{
-		tag:    language.SimplifiedChinese,
-		DTfmt:  "%Y年%m月%d日 %A %H时%M分%S秒",
-		Dfmt:   "%Y年%m月%d日",
-		Tfmt:   "%H时%M分%S秒",
-		Tfmt12: "%p %I时%M分%S秒",
-		AmPm:   [2]string{"上午", "下午"},
-
-		AbDay:   [7]string{"日", "一", "二", "三", "四", "五", "六"},
-		Day:     [7]string{"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"},
-		AbMonth: [12]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
-		Month:   [12]string{"一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"},
-	},
-	&strftimeLocaleInfo{
-		tag:    language.TraditionalChinese,
-		DTfmt:  "%Y年%m月%d日 (%A) %H時%M分%S秒",
-		Dfmt:   "%Y年%m月%d日",
-		Tfmt:   "%H時%M分%S秒",
-		Tfmt12: "%p %I時%M分%S秒",
-		AmPm:   [2]string{"上午", "下午"},
-
-		AbDay:   [7]string{"日", "一", "二", "三", "四", "五", "六"},
-		Day:     [7]string{"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"},
-		AbMonth: [12]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
-		Month:   [12]string{"一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"},
-	},
+	simplifiedChineseLocale,
+	traditionalChineseLocale,
 }

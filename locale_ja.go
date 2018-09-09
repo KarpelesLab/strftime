@@ -16,13 +16,14 @@ var japaneseLocale = &strftimeLocaleInfo{
 	Tfmt12:   "%p%I時%M分%S秒",
 	DTfmtEra: "%EY%m月%d日 %H時%M分%S秒",
 	DfmtEra:  "%EY%m月%d日",
-	AmPm:     [2]string{"午前", "午後"},
+	AmPm:     [...]string{"午前", "午後"},
 	Eyear:    strftimeJapaneseEra,
+	Oprint:   strftimeJapaneseDigit,
 
-	AbDay:   [7]string{"日", "月", "火", "水", "木", "金", "土"},
-	Day:     [7]string{"日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"},
-	AbMonth: [12]string{" 1月", " 2月", " 3月", " 4月", " 5月", " 6月", " 7月", " 8月", " 9月", "10月", "11月", "12月"},
-	Month:   [12]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
+	AbDay:   [...]string{"日", "月", "火", "水", "木", "金", "土"},
+	Day:     [...]string{"日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"},
+	AbMonth: [...]string{" 1月", " 2月", " 3月", " 4月", " 5月", " 6月", " 7月", " 8月", " 9月", "10月", "11月", "12月"},
+	Month:   [...]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
 }
 
 // TODO need something more generic for era
@@ -65,4 +66,46 @@ func strftimeJapaneseEra(t time.Time, r byte) string {
 		}
 	}
 	return fmt.Sprintf("%%E%c", r)
+}
+
+var jpDigits = [...]string{"〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"}
+var jpDozens = [...]string{"十", "百", "千", "万"}
+
+// strftimeJapaneseDigit converts value v into string representation using unicode japanese characters.
+// this will usually never receive a value over 100
+func strftimeJapaneseDigit(b []byte, v int) []byte {
+	if v < 0 {
+		// generally, shouldn't happen
+		v = -v
+		b = append(b, '-')
+	}
+	u := uint(v)
+
+	appd := false
+
+	if u >= 100 {
+		n := u / 100
+		if n > 1 {
+			b = append(b, []byte(jpDigits[n])...)
+		}
+		b = append(b, []byte(jpDozens[1])...)
+		u = u - (n * 100)
+		appd = true
+	}
+
+	if u >= 10 {
+		n := u / 10
+		if n > 1 {
+			b = append(b, []byte(jpDigits[n])...)
+		}
+		b = append(b, []byte(jpDozens[0])...)
+		u = u - (n * 10)
+		appd = true
+	}
+
+	if u > 0 || !appd {
+		b = append(b, []byte(jpDigits[u])...)
+	}
+
+	return b
 }
