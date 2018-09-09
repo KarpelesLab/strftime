@@ -11,7 +11,8 @@ import (
 )
 
 func TestFormat(t *testing.T) {
-	var ref = time.Unix(1136239445, 0).UTC()
+	var ref = time.Unix(1136239445, 456841962).UTC()
+	f := strftime.New(language.AmericanEnglish)
 
 	cmp := []struct{ A, B string }{
 		{`%A`, `Monday`},
@@ -22,6 +23,7 @@ func TestFormat(t *testing.T) {
 		{`%D`, `01/02/06`},
 		{`%d`, `02`},
 		{`%e`, ` 2`},
+		{`%f`, `456841`},
 		{`%F`, `2006-01-02`},
 		{`%H`, `22`},
 		{`%h`, `Jan`},
@@ -56,7 +58,30 @@ func TestFormat(t *testing.T) {
 	}
 
 	for _, x := range cmp {
-		assert.Equal(t, x.B, strftime.Format(language.AmericanEnglish, x.A, ref), `matching for `+x.A)
+		assert.Equal(t, x.B, f.Format(x.A, ref), `matching for `+x.A)
+	}
+}
+
+func TestJapanese(t *testing.T) {
+	var ref = time.Unix(1136239445, 456841962).UTC()
+	f := strftime.New(language.Japanese)
+
+	cmp := []struct {
+		A, B string
+		T    time.Time
+	}{
+		{`%Ec`, `平成18年01月02日 22時04分05秒`, ref},
+		{`%Ex`, `平成18年01月02日`, ref},
+		{`%Ex`, `昭和64年01月07日`, time.Unix(600134400, 0)},
+		{`%Ex`, `平成元年01月08日`, time.Unix(600220800, 0)},
+		{`%Ex`, `昭和20年01月01日`, time.Unix(-788918400, 0)},
+		{`%Ex`, `明治34年01月01日`, time.Unix(-2177452800, 0)},
+		{`%Ex`, `西暦1801年01月01日`, time.Unix(-5333126400, 0)},
+		{`%Ex`, `明治7年01月01日`, time.Unix(-3029443200, 0)},
+		{`%Ex`, `大正4年01月01日`, time.Unix(-1735689600, 0)},
 	}
 
+	for _, x := range cmp {
+		assert.Equal(t, x.B, f.Format(x.A, x.T), `matching for `+x.A)
+	}
 }
