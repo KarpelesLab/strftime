@@ -18,15 +18,8 @@ func Format(l language.Tag, f string, t time.Time) string {
 	locale, ok := strftimeLocaleTable[l]
 	if !ok {
 		// need to match locale
-		avTag := make([]language.Tag, len(strftimeLocaleTable))
-		n := int(0)
-		for tag, _ := range strftimeLocaleTable {
-			avTag[n] = tag
-			n += 1
-		}
-		m := language.NewMatcher(avTag)
-		_, i, _ := m.Match(l)
-		locale = strftimeLocaleTable[avTag[i]]
+		_, i, _ := strftimeLocaleMatcher.Match(l)
+		locale = strftimeLocaleTable[strftimeLocaleTags[i]]
 	}
 	b := &bytes.Buffer{}
 	strftimeInternal(locale, b, f, t)
@@ -46,15 +39,8 @@ func New(l language.Tag) *Formatter {
 	locale, ok := strftimeLocaleTable[l]
 	if !ok {
 		// need to match locale
-		avTag := make([]language.Tag, len(strftimeLocaleTable))
-		n := int(0)
-		for tag, _ := range strftimeLocaleTable {
-			avTag[n] = tag
-			n += 1
-		}
-		m := language.NewMatcher(avTag)
-		_, i, _ := m.Match(l)
-		locale = strftimeLocaleTable[avTag[i]]
+		_, i, _ := strftimeLocaleMatcher.Match(l)
+		locale = strftimeLocaleTable[strftimeLocaleTags[i]]
 	}
 
 	return &Formatter{locale}

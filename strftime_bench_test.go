@@ -56,6 +56,6 @@ func BenchmarkLestrrat(b *testing.B) {
 func BenchmarkMagicalTux(b *testing.B) {
 	var t time.Time
 	for i := 0; i < b.N; i++ {
-		magicaltux.FormatUS(benchfmt, t)
+		magicaltux.FormatEnglish(benchfmt, t)
 	}
 }

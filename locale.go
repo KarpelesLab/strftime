@@ -1,8 +1,6 @@
 package strftime
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 
 	"golang.org/x/text/language"
@@ -31,6 +29,19 @@ type strftimeLocaleInfo struct {
 	AbMonth [12]string
 	Month   [12]string
 }
+
+var strftimeLocaleTags []language.Tag
+
+// build strftimeLocaleMatcher only once
+var strftimeLocaleMatcher = func() language.Matcher {
+	strftimeLocaleTags = make([]language.Tag, len(strftimeLocaleTable))
+	n := int(0)
+	for tag, _ := range strftimeLocaleTable {
+		strftimeLocaleTags[n] = tag
+		n += 1
+	}
+	return language.NewMatcher(strftimeLocaleTags)
+}()
 
 var englishLocale = &strftimeLocaleInfo{
 	DTfmt:  "%a %b %e %H:%M:%S %Y",
@@ -179,21 +190,7 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{" 1월", " 2월", " 3월", " 4월", " 5월", " 6월", " 7월", " 8월", " 9월", "10월", "11월", "12월"},
 		Month:   [12]string{"1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"},
 	},
-	language.Japanese: &strftimeLocaleInfo{
-		DTfmt:    "%Y年%m月%d日 %H時%M分%S秒",
-		Dfmt:     "%Y年%m月%d日",
-		Tfmt:     "%H時%M分%S秒",
-		Tfmt12:   "%p%I時%M分%S秒",
-		DTfmtEra: "%EY%m月%d日 %H時%M分%S秒",
-		DfmtEra:  "%EY%m月%d日",
-		AmPm:     [2]string{"午前", "午後"},
-		Eyear:    strftimeJapaneseEra,
-
-		AbDay:   [7]string{"日", "月", "火", "水", "木", "金", "土"},
-		Day:     [7]string{"日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"},
-		AbMonth: [12]string{" 1月", " 2月", " 3月", " 4月", " 5月", " 6月", " 7月", " 8月", " 9月", "10月", "11月", "12月"},
-		Month:   [12]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
-	},
+	language.Japanese: japaneseLocale,
 	// only character for "hour" changes between Simplified Chinese(时) and Traditional Chinese(時)
 	language.SimplifiedChinese: &strftimeLocaleInfo{
 		DTfmt:  "%Y年%m月%d日 %A %H时%M分%S秒",
@@ -219,39 +216,4 @@ var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
 		AbMonth: [12]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
 		Month:   [12]string{"一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"},
 	},
-}
-
-// TODO need something more generic for era
-func strftimeJapaneseEra(t time.Time, r rune) string {
-	era := "西暦"
-	y, m, d := t.Date()
-
-	switch {
-	case (y > 1989) || ((y == 1989) && (m > 1)) || ((y == 1989) && (m == 1) && (d >= 8)):
-		era = "平成"
-		y -= 1988
-	case (y > 1926) || ((y == 1926) && (m > 12)) || ((y == 1926) && (m == 12) && (d >= 25)):
-		era = "昭和"
-		y -= 1925
-	case (y > 1912) || ((y == 1912) && (m > 7)) || ((y == 1912) && (m == 7) && (d >= 30)):
-		era = "大正"
-		y -= 1911
-	case (y > 1868) || ((y == 1868) && (m > 10)) || ((y == 1868) && (m == 10) && (d >= 23)):
-		era = "明治"
-		y -= 1867
-	}
-
-	switch r {
-	case 'C':
-		return era
-	case 'y':
-		return strconv.FormatInt(int64(y), 10)
-	case 'Y':
-		if y == 1 {
-			return era + "元年"
-		} else {
-			return fmt.Sprintf("%s%d年", era, y)
-		}
-	}
-	return fmt.Sprintf("%%E%c", r)
 }
