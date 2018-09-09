@@ -1,7 +1,9 @@
 package strftime
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 	"time"
@@ -11,6 +13,13 @@ import (
 
 type Formatter struct {
 	l *strftimeLocaleInfo
+}
+
+type strftimeWriter interface {
+	io.Writer
+	WriteByte(byte) error
+	WriteRune(rune) (int, error)
+	WriteString(s string) (n int, err error)
 }
 
 // Format will format the time t following strftime format specified in f using language l.
@@ -60,14 +69,26 @@ func New(l language.Tag) *Formatter {
 	return &Formatter{locale}
 }
 
-func (o *Formatter) Format(f string, t time.Time) string {
+func (obj *Formatter) Format(f string, t time.Time) string {
 	b := strings.Builder{}
-	strftimeInternal(o.l, &b, f, t)
+	strftimeInternal(obj.l, &b, f, t)
 
 	return b.String()
 }
 
-func strftimeInternal(l *strftimeLocaleInfo, b *strings.Builder, f string, t time.Time) {
+func (obj *Formatter) FormatF(o io.Writer, f string, t time.Time) error {
+	if b, ok := o.(strftimeWriter); ok {
+		// output implements the necessary methods to write runes & strings
+		strftimeInternal(obj.l, b, f, t)
+		return nil
+	} else {
+		w := bufio.NewWriter(o)
+		strftimeInternal(obj.l, w, f, t)
+		return w.Flush()
+	}
+}
+
+func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.Time) {
 	prevPercent := rune(0)
 
 	for _, r := range f {
@@ -107,7 +128,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b *strings.Builder, f string, t tim
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Day()))
 			} else {
-				b.WriteString(fmt.Sprintf("%02d", t.Day()))
+				fmt.Fprintf(b, "%02d", t.Day())
 			}
 		case 'D':
 			strftimeInternal(l, b, "%m/%d/%y", t)
