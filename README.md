@@ -10,11 +10,26 @@ Fast strftime in Go with [BCP 47 language tags](https://golang.org/x/text/langua
 
 It is either possible to instanciate an object for a given locale (via `strftime.New`) or directly call strftime.Format().
 
-For example (in French):
+## Examples
+
+To simply get a timestamp in English:
 
 ```go
-f := strftime.New(language.French)
-out.WriteString(f.Format(`pattern`, time.Now()));
+fmt.Printf("%s: something happened", strftime.EnFormat(`%c`, time.Now()));
+```
+
+Or get a quick result in French:
+
+```go
+fmt.Printf("%s: Quelque chose est arrivé", strftime.Format(language.French, `%c`, time.Now()));
+```
+
+Or display a result in the appropriate language for a web user:
+
+```go
+tags, _, _ := language.ParseAcceptLanguage(r.Header.Get("Accept-Language"))
+f := strftime.New(tags...)
+f.FormatF(w, `%c`, time.Now());
 ```
 
 # Description
