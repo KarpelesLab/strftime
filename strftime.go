@@ -104,57 +104,57 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 		prevPercent = 0
 
 		switch r {
-		case 'a':
+		case 'a': // day (abbreviated)
 			b.WriteString(l.AbDay[t.Weekday()])
-		case 'A':
+		case 'A': // day
 			b.WriteString(l.Day[t.Weekday()])
-		case 'b', 'h':
+		case 'b', 'h': // month (abbreviated)
 			b.WriteString(l.AbMonth[int(t.Month())-1])
-		case 'B':
+		case 'B': // month
 			b.WriteString(l.Month[int(t.Month())-1])
-		case 'c':
+		case 'c': // date & time format
 			if thisPercent == 'E' && l.DTfmtEra != "" {
 				strftimeInternal(l, b, l.DTfmtEra, t)
 			} else {
 				strftimeInternal(l, b, l.DTfmt, t)
 			}
-		case 'C':
+		case 'C': // century part of year
 			if thisPercent == 'E' && l.Eyear != nil {
 				b.WriteString(l.Eyear(t, r))
 			} else {
 				b.WriteString(strconv.FormatInt(int64(t.Year()/100), 10))
 			}
-		case 'd':
+		case 'd': // day (two decimals)
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Day()))
 			} else {
 				fmt.Fprintf(b, "%02d", t.Day())
 			}
-		case 'D':
+		case 'D': // date (month/day/year format)
 			strftimeInternal(l, b, "%m/%d/%y", t)
-		case 'e':
+		case 'e': // day
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Day()))
 			} else {
-				b.WriteString(fmt.Sprintf("%2d", t.Day()))
+				fmt.Fprintf(b, "%2d", t.Day())
 			}
 		case 'E':
 			prevPercent = 'E'
 		case 'f':
-			b.WriteString(fmt.Sprintf("%06d", t.Nanosecond()/1000))
+			fmt.Fprintf(b, "%06d", t.Nanosecond()/1000)
 		case 'F':
 			strftimeInternal(l, b, "%Y-%m-%d", t)
 		case 'g':
 			y, _ := t.ISOWeek()
-			b.WriteString(fmt.Sprintf("%d", y%100))
+			fmt.Fprintf(b, "%d", y%100)
 		case 'G':
 			y, _ := t.ISOWeek()
-			b.WriteString(fmt.Sprintf("%d", y))
+			fmt.Fprintf(b, "%d", y)
 		case 'H':
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Hour()))
 			} else {
-				b.WriteString(fmt.Sprintf("%02d", t.Hour()))
+				fmt.Fprintf(b, "%02d", t.Hour())
 			}
 		case 'I':
 			// Noon is 12PM, midnight is 12AM.
@@ -165,30 +165,30 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(h))
 			} else {
-				b.WriteString(fmt.Sprintf("%02d", h))
+				fmt.Fprintf(b, "%02d", h)
 			}
 		case 'j':
-			b.WriteString(fmt.Sprintf("%03d", t.YearDay()))
+			fmt.Fprintf(b, "%03d", t.YearDay())
 		case 'k':
-			b.WriteString(fmt.Sprintf("%2d", t.Hour()))
+			fmt.Fprintf(b, "%2d", t.Hour())
 		case 'l':
 			// Noon is 12PM, midnight is 12AM.
 			h := t.Hour() % 12
 			if h == 0 {
 				h = 12
 			}
-			b.WriteString(fmt.Sprintf("%2d", h))
+			fmt.Fprintf(b, "%2d", h)
 		case 'm':
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(int(t.Month())))
 			} else {
-				b.WriteString(fmt.Sprintf("%02d", t.Month()))
+				fmt.Fprintf(b, "%02d", t.Month())
 			}
 		case 'M':
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Minute()))
 			} else {
-				b.WriteString(fmt.Sprintf("%02d", t.Minute()))
+				fmt.Fprintf(b, "%02d", t.Minute())
 			}
 		case 'n':
 			b.WriteByte('\n')
@@ -216,7 +216,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Second()))
 			} else {
-				b.WriteString(fmt.Sprintf("%02d", t.Second()))
+				fmt.Fprintf(b, "%02d", t.Second())
 			}
 		case 't':
 			b.WriteByte('\t')
@@ -277,7 +277,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			} else if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Year() % 100))
 			} else {
-				b.WriteString(fmt.Sprintf("%02d", t.Year()%100))
+				fmt.Fprintf(b, "%02d", t.Year()%100)
 			}
 		case 'Y':
 			if thisPercent == 'E' && l.Eyear != nil {
@@ -294,7 +294,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			} else {
 				b.WriteByte('+')
 			}
-			b.WriteString(fmt.Sprintf("%02d%02d", z/60, z%60))
+			fmt.Fprintf(b, "%02d%02d", z/60, z%60)
 		case 'Z':
 			n, _ := t.Zone()
 			b.WriteString(n)
