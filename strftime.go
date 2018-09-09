@@ -34,10 +34,10 @@ func Format(l language.Tag, f string, t time.Time) string {
 	return b.String()
 }
 
-// FormatUS formats time t using format f and US locale.
-func FormatUS(f string, t time.Time) string {
+// FormatUS formats time t using format f and English locale.
+func FormatEnglish(f string, t time.Time) string {
 	b := &bytes.Buffer{}
-	strftimeInternal(usLocale, b, f, t)
+	strftimeInternal(englishLocale, b, f, t)
 
 	return b.String()
 }

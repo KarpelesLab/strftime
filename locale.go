@@ -32,9 +32,9 @@ type strftimeLocaleInfo struct {
 	Month   [12]string
 }
 
-var usLocale = &strftimeLocaleInfo{
+var englishLocale = &strftimeLocaleInfo{
 	DTfmt:  "%a %b %e %H:%M:%S %Y",
-	Dfmt:   "%m/%d/%Y",
+	Dfmt:   "%m/%d/%y",
 	Tfmt:   "%H:%M:%S",
 	Tfmt12: "%I:%M:%S %p",
 	AmPm:   [2]string{"AM", "PM"},
@@ -46,7 +46,19 @@ var usLocale = &strftimeLocaleInfo{
 }
 
 var strftimeLocaleTable = map[language.Tag]*strftimeLocaleInfo{
-	language.AmericanEnglish: usLocale,
+	language.English: englishLocale,
+	language.AmericanEnglish: &strftimeLocaleInfo{
+		DTfmt:  "%a %b %e %H:%M:%S %Y",
+		Dfmt:   "%m/%d/%Y",
+		Tfmt:   "%H:%M:%S",
+		Tfmt12: "%I:%M:%S %p",
+		AmPm:   [2]string{"AM", "PM"},
+
+		AbDay:   [7]string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"},
+		Day:     [7]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"},
+		AbMonth: [12]string{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
+		Month:   [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"},
+	},
 	language.BritishEnglish: &strftimeLocaleInfo{
 		DTfmt:  "%a %d %b %Y %T %Z",
 		Dfmt:   "%m/%d/%y",

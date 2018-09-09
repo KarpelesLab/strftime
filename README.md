@@ -85,7 +85,7 @@ PASS
 ok  	github.com/MagicalTux/strftime	9.141s
 ```
 
-This library is much faster than other libraries for common cases. In case of format pattern re-use, [Lestrrat's implementation](github.com/lestrrat-go/strftime) is still faster (but has no locale awareness).
+This library is much faster than other libraries for common cases. In case of format pattern re-use, [Lestrrat's implementation](https://github.com/lestrrat-go/strftime) is still faster (but has no locale awareness).
 
 | Import Path                         | Score      | Note                            |
 |:------------------------------------|-----------:|:--------------------------------|
