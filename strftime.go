@@ -61,6 +61,11 @@ func (obj *Formatter) Format(f string, t time.Time) string {
 	return string(b)
 }
 
+// AppendFormat is like Format but appends the textual representation to b and returns the extended buffer.
+func (obj *Formatter) AppendFormat(b []byte, f string, t time.Time) []byte {
+	return strftimeAppend(obj.l, b, []byte(f), t)
+}
+
 // FormatF formats time using provided format, and outputs it to the provided io.Writer.
 func (obj *Formatter) FormatF(o io.Writer, f string, t time.Time) error {
 	// output implements the necessary methods to write runes & strings
