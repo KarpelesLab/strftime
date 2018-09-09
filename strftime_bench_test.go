@@ -10,8 +10,10 @@ import (
 	"time"
 
 	magicaltux "github.com/MagicalTux/strftime"
+	cactus "github.com/cactus/gostrftime"
 	fastly "github.com/fastly/go-utils/strftime"
 	jehiah "github.com/jehiah/go-strftime"
+	leekchan "github.com/leekchan/timeutil"
 	lestrrat "github.com/lestrrat-go/strftime"
 	tebeka "github.com/tebeka/strftime"
 )
@@ -23,6 +25,20 @@ func init() {
 }
 
 const benchfmt = `%A %a %B %b %d %H %I %M %m %p %S %Y %y %Z`
+
+func BenchmarkCactus(b *testing.B) {
+	var t time.Time
+	for i := 0; i < b.N; i++ {
+		cactus.Format(benchfmt, t)
+	}
+}
+
+func BenchmarkLeekchan(b *testing.B) {
+	var t time.Time
+	for i := 0; i < b.N; i++ {
+		leekchan.Strftime(&t, benchfmt)
+	}
+}
 
 func BenchmarkTebeka(b *testing.B) {
 	var t time.Time

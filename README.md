@@ -81,24 +81,28 @@ This version of strftime for Go has multiple goals in mind:
 // go version go1.11 linux/amd64
 $ go test -tags bench -benchmem -bench .
 <snip>
-BenchmarkTebeka-12        	  500000	      3780 ns/op	     288 B/op	      21 allocs/op
-BenchmarkJehiah-12        	 1000000	      1549 ns/op	     256 B/op	      17 allocs/op
-BenchmarkFastly-12        	  500000	      3642 ns/op	     192 B/op	      11 allocs/op
-BenchmarkLestrrat-12      	 1000000	      1335 ns/op	     240 B/op	       3 allocs/op
-BenchmarkMagicalTux-12    	 2000000	       804 ns/op	     227 B/op	       9 allocs/op
+BenchmarkCactus-12        	 1000000	      1709 ns/op	     216 B/op	       7 allocs/op
+BenchmarkLeekchan-12      	  500000	      2728 ns/op	    1376 B/op	      22 allocs/op
+BenchmarkTebeka-12        	  300000	      3836 ns/op	     288 B/op	      21 allocs/op
+BenchmarkJehiah-12        	 1000000	      1541 ns/op	     256 B/op	      17 allocs/op
+BenchmarkFastly-12        	  500000	      3735 ns/op	     192 B/op	      11 allocs/op
+BenchmarkLestrrat-12      	 1000000	      1319 ns/op	     240 B/op	       3 allocs/op
+BenchmarkMagicalTux-12    	 2000000	       810 ns/op	     227 B/op	       9 allocs/op
 PASS
-ok  	github.com/MagicalTux/strftime	9.141s
+ok  	github.com/MagicalTux/strftime	11.566s
 ```
 
 This library is much faster than other libraries for common cases. In case of format pattern re-use, [Lestrrat's implementation](https://github.com/lestrrat-go/strftime) is still faster (but has no locale awareness).
 
 | Import Path                         | Score      | Note                            |
 |:------------------------------------|-----------:|:--------------------------------|
-| github.com/MagicalTux/strftime      | 804 ns/op  |                                 |
-| github.com/lestrrat-go/strftime     | 1335 ns/op | Using `Format()` (NOT cached)   |
-| github.com/jehiah/go-strftime       | 1549 ns/op |                                 |
-| github.com/fastly/go-utils/strftime | 3642 ns/op | cgo version on Linux            |
-| github.com/tebeka/strftime          | 3780 ns/op |                                 |
+| github.com/MagicalTux/strftime      | 810 ns/op  |                                 |
+| github.com/lestrrat-go/strftime     | 1319 ns/op | Using `Format()` (NOT cached)   |
+| github.com/jehiah/go-strftime       | 1541 ns/op |                                 |
+| github.com/cactus/gostrftime        | 1709 ns/op |                                 |
+| github.com/leekchan/timeutil        | 2728 ns/op |                                 |
+| github.com/fastly/go-utils/strftime | 3735 ns/op | cgo version on Linux            |
+| github.com/tebeka/strftime          | 3836 ns/op |                                 |
 
 Please note that this benchmark only uses the subset of conversion specifications that are supported by *ALL* of the libraries compared.
 
