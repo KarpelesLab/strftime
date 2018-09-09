@@ -2,6 +2,7 @@ package strftime
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"time"
 
@@ -27,7 +28,7 @@ func Format(l language.Tag, f string, t time.Time) string {
 		_, i, _ := m.Match(l)
 		locale = strftimeLocaleTable[avTag[i]]
 	}
-	b := makeWriterBuf()
+	b := &bytes.Buffer{}
 	strftimeInternal(locale, b, f, t)
 
 	return b.String()
@@ -35,7 +36,7 @@ func Format(l language.Tag, f string, t time.Time) string {
 
 // FormatUS formats time t using format f and US locale.
 func FormatUS(f string, t time.Time) string {
-	b := makeWriterBuf()
+	b := &bytes.Buffer{}
 	strftimeInternal(usLocale, b, f, t)
 
 	return b.String()
@@ -60,7 +61,7 @@ func New(l language.Tag) *Formatter {
 }
 
 func (obj *Formatter) Format(f string, t time.Time) string {
-	b := makeWriterBuf()
+	b := &bytes.Buffer{}
 	strftimeInternal(obj.l, b, f, t)
 
 	return b.String()

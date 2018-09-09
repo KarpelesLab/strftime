@@ -8,8 +8,3 @@ type strftimeWriter interface {
 	WriteRune(rune) (int, error)
 	WriteString(s string) (n int, err error)
 }
-
-type strftimeWriterBuf interface {
-	strftimeWriter
-	String() string
-}
