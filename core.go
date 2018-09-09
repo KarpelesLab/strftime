@@ -7,23 +7,26 @@ import (
 )
 
 func strftimeAppend(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []byte {
+	skip := 0
+
 	for len(f) > 0 {
 		i := bytes.IndexByte(f, '%')
-		if i == -1 {
-			// end of string
-			return append(b, f...)
-		}
 		if i > 0 {
 			b = append(b, f[:i]...)
 			f = f[i:]
+		} else if i == -1 {
+			// end of string
+			return append(b, f...)
 		}
+		// at this point, f always starts with a % symbol
+
 		if len(f) < 2 {
 			// can't have anything anymore
 			return append(b, f...)
 		}
 
-		// at this point, f always starts with a % symbol
-		skip := 2 // number of bytes to skip
+		skip = 2 // number of bytes to skip
+
 		switch f[1] {
 		case 'E':
 			if len(f) < 3 {
