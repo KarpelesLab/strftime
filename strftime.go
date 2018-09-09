@@ -2,7 +2,6 @@ package strftime
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -118,6 +117,7 @@ func writeInt(w io.Writer, x int, width int) error {
 	return err
 }
 
+// optimized writeInt for unsigned values below 256
 func writeUint8(w io.Writer, u uint8, width int) error {
 	var buf [3]byte
 	i := len(buf)
@@ -136,6 +136,31 @@ func writeUint8(w io.Writer, u uint8, width int) error {
 	for w := len(buf) - i; w < width; w++ {
 		i--
 		buf[i] = '0'
+	}
+
+	_, err := w.Write(buf[i:])
+	return err
+}
+
+// version with space padding
+func writeUint8Sp(w io.Writer, u uint8, width int) error {
+	var buf [3]byte
+	i := len(buf)
+
+	// Assemble decimal in reverse order.
+	for u >= 10 {
+		i--
+		q := u / 10
+		buf[i] = byte('0' + u - q*10)
+		u = q
+	}
+	i--
+	buf[i] = byte('0' + u)
+
+	// Add 0-padding.
+	for w := len(buf) - i; w < width; w++ {
+		i--
+		buf[i] = ' '
 	}
 
 	_, err := w.Write(buf[i:])
@@ -190,7 +215,7 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(t.Day()))
 			} else {
-				fmt.Fprintf(b, "%2d", t.Day())
+				writeUint8Sp(b, uint8(t.Day()), 2)
 			}
 		case 'E':
 			prevPercent = 'E'
@@ -224,14 +249,14 @@ func strftimeInternal(l *strftimeLocaleInfo, b strftimeWriter, f string, t time.
 		case 'j':
 			writeInt(b, t.YearDay(), 3)
 		case 'k':
-			fmt.Fprintf(b, "%2d", t.Hour())
+			writeUint8Sp(b, uint8(t.Hour()), 2)
 		case 'l':
 			// Noon is 12PM, midnight is 12AM.
 			h := t.Hour() % 12
 			if h == 0 {
 				h = 12
 			}
-			fmt.Fprintf(b, "%2d", h)
+			writeUint8Sp(b, uint8(h), 2)
 		case 'm':
 			if thisPercent == 'O' && l.Oprint != nil {
 				b.WriteString(l.Oprint(int(t.Month())))
