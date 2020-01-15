@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	magicaltux "github.com/MagicalTux/strftime"
+	magicaltux "github.com/KarpelesLab/strftime"
 	cactus "github.com/cactus/gostrftime"
 	fastly "github.com/fastly/go-utils/strftime"
 	jehiah "github.com/jehiah/go-strftime"
@@ -69,7 +69,7 @@ func BenchmarkLestrrat(b *testing.B) {
 	}
 }
 
-func BenchmarkMagicalTux(b *testing.B) {
+func BenchmarkKarpelesLab(b *testing.B) {
 	var t time.Time
 	for i := 0; i < b.N; i++ {
 		magicaltux.EnFormat(benchfmt, t)

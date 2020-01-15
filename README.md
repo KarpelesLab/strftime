@@ -2,9 +2,9 @@
 
 Fast strftime in Go with [BCP 47 language tags](https://golang.org/x/text/language).
 
-[![Build Status](https://travis-ci.org/MagicalTux/strftime.png?branch=master)](https://travis-ci.org/MagicalTux/strftime)
+[![Build Status](https://travis-ci.org/KarpelesLab/strftime.png?branch=master)](https://travis-ci.org/KarpelesLab/strftime)
 
-[![GoDoc](https://godoc.org/github.com/MagicalTux/strftime?status.svg)](https://godoc.org/github.com/MagicalTux/strftime)
+[![GoDoc](https://godoc.org/github.com/KarpelesLab/strftime?status.svg)](https://godoc.org/github.com/KarpelesLab/strftime)
 
 # Usage
 
@@ -119,16 +119,16 @@ BenchmarkTebeka-12        	  500000	      3777 ns/op	     288 B/op	      21 allo
 BenchmarkJehiah-12        	 1000000	      1555 ns/op	     256 B/op	      17 allocs/op
 BenchmarkFastly-12        	  500000	      3774 ns/op	     192 B/op	      11 allocs/op
 BenchmarkLestrrat-12      	 1000000	      1333 ns/op	     240 B/op	       3 allocs/op
-BenchmarkMagicalTux-12    	 2000000	       688 ns/op	     240 B/op	       3 allocs/op
+BenchmarkKarpelesLab-12    	 2000000	       688 ns/op	     240 B/op	       3 allocs/op
 PASS
-ok  	github.com/MagicalTux/strftime	11.997s
+ok  	github.com/KarpelesLab/strftime	11.997s
 ```
 
 This library is much faster than other libraries for common cases. In case of format pattern re-use, [Lestrrat's implementation](https://github.com/lestrrat-go/strftime) is still faster (but has no locale awareness).
 
 | Import Path                         | Score      | Note                            |
 |:------------------------------------|-----------:|:--------------------------------|
-| github.com/MagicalTux/strftime      | 688 ns/op  |                                 |
+| github.com/KarpelesLab/strftime      | 688 ns/op  |                                 |
 | github.com/lestrrat-go/strftime     | 1333 ns/op | Using `Format()` (NOT cached)   |
 | github.com/jehiah/go-strftime       | 1555 ns/op |                                 |
 | github.com/cactus/gostrftime        | 1697 ns/op |                                 |

@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/MagicalTux/strftime"
+	"github.com/KarpelesLab/strftime"
 	"github.com/stretchr/testify/assert"
 )
 
