@@ -1,6 +1,7 @@
 package strftime_test
 
 import (
+	"bytes"
 	"testing"
 	"time"
 
@@ -175,4 +176,26 @@ func TestLocale(t *testing.T) {
 		f := strftime.New(tags...)
 		assert.Equal(t, x.B, f.Format(`%c`, ref), `language detect for `+x.A)
 	}
+}
+
+func TestApi(t *testing.T) {
+	// testing through different methods
+	f := strftime.New(language.English)
+	ref := time.Unix(1136239445, 456841962).UTC()
+	good := `Mon Jan  2 22:04:05 2006`
+
+	assert.Equal(t, good, strftime.Format(language.English, `%c`, ref), `testing strftime.Format`)
+	assert.Equal(t, good, strftime.EnFormat(`%c`, ref), `testing for strftime.EnFormat`)
+
+	buf := &bytes.Buffer{}
+	strftime.EnFormatF(buf, `%c`, ref)
+	assert.Equal(t, good, buf.String(), `testing for strftime.EnFormatF`)
+
+	out := []byte("Test: ")
+	out = f.AppendFormat(out, `%c`, ref)
+	assert.Equal(t, append([]byte("Test: "), []byte(good)...), out, `testing for Formatter.AppendFormat`)
+
+	buf = &bytes.Buffer{}
+	f.FormatF(buf, `%c`, ref)
+	assert.Equal(t, good, buf.String(), `testing for Formatter.FormatF`)
 }
