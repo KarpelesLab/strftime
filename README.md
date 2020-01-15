@@ -1,10 +1,10 @@
+[![Build Status](https://travis-ci.org/KarpelesLab/strftime.png?branch=master)](https://travis-ci.org/KarpelesLab/strftime)
+[![GoDoc](https://godoc.org/github.com/KarpelesLab/strftime?status.svg)](https://godoc.org/github.com/KarpelesLab/strftime)
+[![Coverage Status](https://coveralls.io/repos/github/KarpelesLab/strftime/badge.svg?branch=master)](https://coveralls.io/github/KarpelesLab/strftime?branch=master)
+
 # strftime
 
 Fast strftime in Go with [BCP 47 language tags](https://golang.org/x/text/language).
-
-[![Build Status](https://travis-ci.org/KarpelesLab/strftime.png?branch=master)](https://travis-ci.org/KarpelesLab/strftime)
-
-[![GoDoc](https://godoc.org/github.com/KarpelesLab/strftime?status.svg)](https://godoc.org/github.com/KarpelesLab/strftime)
 
 # Usage
 
