@@ -74,6 +74,13 @@ func TestFormat(t *testing.T) {
 
 		// full test from https://github.com/lestrrat-go/strftime
 		{`%A %a %B %b %C %c %D %d %e %F %H %h %I %j %k %l %M %m %n %p %R %r %S %T %t %U %u %V %v %W %w %X %x %Y %y %Z %z`, "Monday Mon January Jan 20 Mon Jan  2 22:04:05 2006 01/02/06 02  2 2006-01-02 22 Jan 10 002 22 10 04 01 \n PM 22:04 10:04:05 PM 05 22:04:05 \t 01 1 01  2-Jan-2006 01 1 22:04:05 01/02/06 2006 06 UTC +0000"},
+
+		{`%Ec`, `Mon Jan  2 22:04:05 2006`},
+		{`%EC`, `20`},
+		{`%Ex`, `01/02/06`},
+		{`%EX`, `22:04:05`},
+		{`%Ey`, `06`},
+		{`%EY`, `2006`},
 	}
 
 	for _, x := range cmp {
@@ -128,6 +135,7 @@ func TestJapanese(t *testing.T) {
 		{`%Oy`, `六`, ref},
 		{`%OH`, `二十二`, ref},
 		{`%OI`, `十`, ref},
+		{`%Od %Om %OH:%OM:%OS %OV %OW %Ow`, `二 一 二十二:四:五 一 一 一`, ref},
 	}
 
 	for _, x := range cmp {
