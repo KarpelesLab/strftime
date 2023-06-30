@@ -1,4 +1,4 @@
-// +build bench
+//go:build bench
 
 package strftime_test
 
