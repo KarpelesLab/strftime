@@ -38,8 +38,15 @@ func Format(l language.Tag, f string, t time.Time) string {
 		_, i, _ := strftimeLocaleMatcher.Match(l)
 		locale = strftimeLocales[i]
 	}
-	b := appendStrftime(locale, make([]byte, 0, 32+len(f)*2), []byte(f), t)
 
+	// Initial capacity calculation: format string + some extra space
+	// We use a multiplier of 1.5 as a reasonable estimate for expansion ratio
+	initialCap := len(f) + len(f)/2
+	if initialCap < 64 {
+		initialCap = 64 // Minimum size to avoid small allocations
+	}
+
+	b := appendStrftime(locale, make([]byte, 0, initialCap), []byte(f), t)
 	return string(b)
 }
 
@@ -52,7 +59,14 @@ func Format(l language.Tag, f string, t time.Time) string {
 //
 // Returns: Formatted time string in English locale
 func EnFormat(f string, t time.Time) string {
-	return EnglishFormatter.Format(f, t)
+	// Initial capacity calculation: format string + some extra space
+	initialCap := len(f) + len(f)/2
+	if initialCap < 64 {
+		initialCap = 64 // Minimum size to avoid small allocations
+	}
+
+	b := appendStrftime(englishLocale, make([]byte, 0, initialCap), []byte(f), t)
+	return string(b)
 }
 
 // EnFormatF formats time t using format f in English locale and outputs it to the provided io.Writer.
@@ -65,7 +79,15 @@ func EnFormat(f string, t time.Time) string {
 //
 // Returns: Error if writing to the io.Writer fails
 func EnFormatF(o io.Writer, f string, t time.Time) error {
-	return EnglishFormatter.FormatF(o, f, t)
+	// Initial capacity calculation based on format string length
+	initialCap := len(f) + len(f)/2
+	if initialCap < 64 {
+		initialCap = 64 // Minimum size to avoid small allocations
+	}
+
+	b := appendStrftime(englishLocale, make([]byte, 0, initialCap), []byte(f), t)
+	_, err := o.Write(b)
+	return err
 }
 
 // New creates a new Formatter by matching given language tags against known tags.
@@ -141,8 +163,13 @@ func New(l ...language.Tag) *Formatter {
 //
 // Returns: Formatted time string according to this Formatter's locale
 func (obj *Formatter) Format(f string, t time.Time) string {
-	b := appendStrftime(obj.l, make([]byte, 0, 32+len(f)*2), []byte(f), t)
+	// Initial capacity calculation based on format string length
+	initialCap := len(f) + len(f)/2
+	if initialCap < 64 {
+		initialCap = 64 // Minimum size to avoid small allocations
+	}
 
+	b := appendStrftime(obj.l, make([]byte, 0, initialCap), []byte(f), t)
 	return string(b)
 }
 
@@ -169,8 +196,13 @@ func (obj *Formatter) AppendFormat(b []byte, f string, t time.Time) []byte {
 //
 // Returns: Error if writing to the io.Writer fails
 func (obj *Formatter) FormatF(o io.Writer, f string, t time.Time) error {
-	// output implements the necessary methods to write runes & strings
-	b := appendStrftime(obj.l, make([]byte, 0, 32+len(f)*2), []byte(f), t)
+	// Initial capacity calculation based on format string length
+	initialCap := len(f) + len(f)/2
+	if initialCap < 64 {
+		initialCap = 64 // Minimum size to avoid small allocations
+	}
+
+	b := appendStrftime(obj.l, make([]byte, 0, initialCap), []byte(f), t)
 	_, err := o.Write(b)
 	return err
 }

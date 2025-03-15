@@ -73,6 +73,14 @@ import (
 func appendStrftime(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []byte {
 	var skip, i int
 
+	// Preallocate additional space in the buffer if needed
+	// This helps reduce the number of allocations during append operations
+	if cap(b)-len(b) < len(f) {
+		newBuf := make([]byte, len(b), len(b)+len(f))
+		copy(newBuf, b)
+		b = newBuf
+	}
+
 	for len(f) > 0 {
 		i = bytes.IndexByte(f, '%')
 		if i > 0 {

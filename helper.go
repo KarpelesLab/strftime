@@ -83,6 +83,31 @@ func appendInt64(b []byte, x int64, width int) []byte {
 //
 // Returns: The extended byte slice with the formatted integer appended
 func appendUint8(b []byte, u uint8, width int) []byte {
+	// Fast path for common small values with width=2 (hours, minutes, seconds)
+	if width == 2 && u < 100 {
+		// Ensure we have enough space for two digits
+		if cap(b)-len(b) < 2 {
+			newB := make([]byte, len(b), len(b)+2)
+			copy(newB, b)
+			b = newB
+		}
+
+		if u < 10 {
+			// Single digit with zero padding
+			b = append(b, '0')
+			b = append(b, byte('0'+u))
+			return b
+		} else {
+			// Two digits
+			tens := u / 10
+			ones := u % 10
+			b = append(b, byte('0'+tens))
+			b = append(b, byte('0'+ones))
+			return b
+		}
+	}
+
+	// Regular path for other values or widths
 	// Assemble decimal in reverse order.
 	var buf [3]byte
 	i := len(buf)
@@ -113,6 +138,31 @@ func appendUint8(b []byte, u uint8, width int) []byte {
 //
 // Returns: The extended byte slice with the formatted integer appended
 func appendUint8Sp(b []byte, u uint8, width int) []byte {
+	// Fast path for common case with width=2 (days, etc.)
+	if width == 2 && u < 100 {
+		// Ensure we have enough space
+		if cap(b)-len(b) < 2 {
+			newB := make([]byte, len(b), len(b)+2)
+			copy(newB, b)
+			b = newB
+		}
+
+		if u < 10 {
+			// Single digit with space padding
+			b = append(b, ' ')
+			b = append(b, byte('0'+u))
+			return b
+		} else {
+			// Two digits
+			tens := u / 10
+			ones := u % 10
+			b = append(b, byte('0'+tens))
+			b = append(b, byte('0'+ones))
+			return b
+		}
+	}
+
+	// Regular path for other values or widths
 	// Assemble decimal in reverse order.
 	var buf [3]byte
 	i := len(buf)
