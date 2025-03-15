@@ -81,16 +81,55 @@ func EnFormatF(o io.Writer, f string, t time.Time) error {
 //
 // Returns: A new Formatter instance configured for the best matching locale
 func New(l ...language.Tag) *Formatter {
-	if len(l) == 1 {
-		if locale, ok := strftimeLocaleTable[l[0]]; ok {
+	if len(l) == 0 {
+		// No language specified, use English as default
+		return &Formatter{englishLocale}
+	}
+
+	// Step 1: Try a direct match first for each provided tag (highest priority)
+	for _, tag := range l {
+		if locale, ok := strftimeLocaleTable[tag]; ok {
 			return &Formatter{locale}
 		}
 	}
-	// need to match locale
-	_, i, _ := strftimeLocaleMatcher.Match(l...)
-	locale := strftimeLocales[i]
 
-	return &Formatter{locale}
+	// Step 2: Filter out invalid tags (like "xx") and keep only valid ones
+	var validTags []language.Tag
+	for _, tag := range l {
+		// Check if it's a valid tag with a recognized language
+		base, _ := tag.Base()
+		if base.String() != "und" {
+			validTags = append(validTags, tag)
+		}
+	}
+
+	// If we have any valid tags, use those for matching
+	if len(validTags) > 0 {
+		// Step 3: Try base language matches for all valid tags
+		for _, tag := range validTags {
+			// Extract just the language part (e.g., "en" from "en-US")
+			base, _ := tag.Base()
+			baseLang := language.Make(base.String())
+
+			// Check for base language match in our supported locales
+			if locale, ok := strftimeLocaleTable[baseLang]; ok {
+				return &Formatter{locale}
+			}
+
+			// Also try extended matches via the matcher for this specific tag
+			_, index, conf := strftimeLocaleMatcher.Match(baseLang)
+			if conf >= language.High {
+				return &Formatter{strftimeLocales[index]}
+			}
+		}
+
+		// Step 4: If no direct base language match, use language matcher with all valid tags
+		_, index, _ := strftimeLocaleMatcher.Match(validTags...)
+		return &Formatter{strftimeLocales[index]}
+	}
+
+	// Step 5: Fallback to default English if no valid tags provided
+	return &Formatter{englishLocale}
 }
 
 // Format formats time using provided format, and returns a string.

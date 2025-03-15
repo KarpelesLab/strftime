@@ -154,6 +154,52 @@ func TestFrench(t *testing.T) {
 		T    time.Time
 	}{
 		{`%p %P`, ` `, ref},
+		{`%A %d %B %Y`, `lundi 02 janvier 2006`, ref},
+		{`%a %d %b %Y`, `lun. 02 janv. 2006`, ref},
+		{`%x`, `02/01/2006`, ref},
+	}
+
+	for _, x := range cmp {
+		assert.Equal(t, x.B, f.Format(x.A, x.T.UTC()), `matching for `+x.A)
+	}
+}
+
+// TestGerman tests the German locale formatting
+func TestGerman(t *testing.T) {
+	ref := time.Unix(1136239445, 456841962).UTC()
+	f := strftime.New(language.German)
+
+	cmp := []struct {
+		A, B string
+		T    time.Time
+	}{
+		{`%A`, `Montag`, ref},
+		{`%a`, `Mo`, ref},
+		{`%B`, `Januar`, ref},
+		{`%b`, `Jan`, ref},
+		{`%x`, `02.01.2006`, ref},
+	}
+
+	for _, x := range cmp {
+		assert.Equal(t, x.B, f.Format(x.A, x.T.UTC()), `matching for `+x.A)
+	}
+}
+
+// TestRussian tests the Russian locale formatting
+func TestRussian(t *testing.T) {
+	ref := time.Unix(1136239445, 456841962).UTC()
+	f := strftime.New(language.Russian)
+
+	cmp := []struct {
+		A, B string
+		T    time.Time
+	}{
+		{`%A`, `Понедельник`, ref},
+		{`%a`, `Пн`, ref},
+		{`%B`, `Январь`, ref},
+		{`%b`, `янв`, ref},
+		{`%x`, `02.01.2006`, ref},
+		{`%c`, `Пн 02 янв 2006 22:04:05`, ref},
 	}
 
 	for _, x := range cmp {
@@ -177,6 +223,186 @@ func TestLocale(t *testing.T) {
 		f := strftime.New(tags...)
 		assert.Equal(t, x.B, f.Format(`%c`, ref), `language detect for `+x.A)
 	}
+}
+
+// TestChinese tests both Simplified and Traditional Chinese locale formatting
+func TestChinese(t *testing.T) {
+	ref := time.Unix(1136239445, 456841962).UTC()
+
+	// Test Simplified Chinese
+	scf := strftime.New(language.SimplifiedChinese)
+	cmp := []struct {
+		A, B string
+		T    time.Time
+	}{
+		{`%A`, `星期一`, ref},
+		{`%a`, `一`, ref},
+		{`%B`, `一月`, ref},
+		{`%b`, `1月`, ref},
+		{`%Y年%m月%d日`, `2006年01月02日`, ref},
+		{`%H时%M分%S秒`, `22时04分05秒`, ref}, // Note the simplified character for hour: 时
+		{`%p`, `下午`, ref},               // PM in Chinese
+	}
+
+	for _, x := range cmp {
+		assert.Equal(t, x.B, scf.Format(x.A, x.T.UTC()), `Simplified Chinese matching for `+x.A)
+	}
+
+	// Test Traditional Chinese
+	tcf := strftime.New(language.TraditionalChinese)
+	tcmp := []struct {
+		A, B string
+		T    time.Time
+	}{
+		{`%A`, `星期一`, ref},
+		{`%a`, `一`, ref},
+		{`%B`, `一月`, ref},
+		{`%b`, `1月`, ref},
+		{`%Y年%m月%d日`, `2006年01月02日`, ref},
+		{`%H時%M分%S秒`, `22時04分05秒`, ref}, // Note the traditional character for hour: 時
+		{`%p`, `下午`, ref},               // PM in Chinese
+	}
+
+	for _, x := range tcmp {
+		assert.Equal(t, x.B, tcf.Format(x.A, x.T.UTC()), `Traditional Chinese matching for `+x.A)
+	}
+}
+
+// TestEdgeCases tests various edge cases and uncommon format combinations
+func TestEdgeCases(t *testing.T) {
+	f := strftime.New(language.English)
+
+	// Test leap year Feb 29
+	leapDay := time.Date(2020, 2, 29, 12, 30, 45, 0, time.UTC)
+	assert.Equal(t, "02/29/20", f.Format("%D", leapDay), "Leap day formatting")
+	assert.Equal(t, "060", f.Format("%j", leapDay), "Day of year for leap day")
+
+	// Test December 31 (last day of year)
+	lastDay := time.Date(2020, 12, 31, 23, 59, 59, 0, time.UTC)
+	assert.Equal(t, "366", f.Format("%j", lastDay), "Day of year for Dec 31 in leap year")
+	assert.Equal(t, "52", f.Format("%U", lastDay), "Week number for last day of year")
+
+	// Test midnight formatting
+	midnight := time.Date(2020, 1, 15, 0, 0, 0, 0, time.UTC)
+	assert.Equal(t, "00:00:00", f.Format("%T", midnight), "Midnight in 24h format")
+	assert.Equal(t, "12:00:00 AM", f.Format("%r", midnight), "Midnight in 12h format")
+
+	// Test noon formatting
+	noon := time.Date(2020, 1, 15, 12, 0, 0, 0, time.UTC)
+	assert.Equal(t, "12:00:00", f.Format("%T", noon), "Noon in 24h format")
+	assert.Equal(t, "12:00:00 PM", f.Format("%r", noon), "Noon in 12h format")
+
+	// Test milliseconds/microseconds
+	withMicro := time.Date(2020, 1, 15, 12, 0, 0, 123456789, time.UTC)
+	assert.Equal(t, "123456", f.Format("%f", withMicro), "Microseconds formatting")
+}
+
+// TestCommonCombinations tests format string combinations commonly used in applications
+func TestCommonCombinations(t *testing.T) {
+	ref := time.Unix(1136239445, 456841962).UTC() // 2006-01-02 22:04:05.456841962 UTC
+	f := strftime.New(language.English)
+
+	// ISO 8601 date and variations
+	assert.Equal(t, "2006-01-02", f.Format("%Y-%m-%d", ref), "ISO 8601 date format")
+	assert.Equal(t, "2006-01-02T22:04:05", f.Format("%Y-%m-%dT%H:%M:%S", ref), "ISO 8601 datetime without timezone")
+	assert.Equal(t, "2006-01-02T22:04:05+0000", f.Format("%Y-%m-%dT%H:%M:%S%z", ref), "ISO 8601 datetime with timezone")
+
+	// Common log formats
+	assert.Equal(t, "02/Jan/2006:22:04:05 +0000", f.Format("%d/%b/%Y:%H:%M:%S %z", ref), "Common Log Format date")
+	assert.Equal(t, "Mon, 02 Jan 2006 22:04:05 +0000", f.Format("%a, %d %b %Y %H:%M:%S %z", ref), "RFC 7231 format (HTTP Date)")
+
+	// Common display formats
+	assert.Equal(t, "Jan  2, 2006", f.Format("%b %e, %Y", ref), "Common US date display format")
+	assert.Equal(t, "Monday, January  2, 2006", f.Format("%A, %B %e, %Y", ref), "Long US date display format")
+	assert.Equal(t, "10:04 PM", f.Format("%I:%M %p", ref), "12-hour time display")
+}
+
+// TestBoundaryConditions tests boundary time conditions
+func TestBoundaryConditions(t *testing.T) {
+	f := strftime.New(language.English)
+
+	// Test Unix epoch
+	epoch := time.Unix(0, 0).UTC() // 1970-01-01 00:00:00 UTC
+	assert.Equal(t, "1970-01-01", f.Format("%Y-%m-%d", epoch), "Unix epoch date")
+	assert.Equal(t, "00:00:00", f.Format("%H:%M:%S", epoch), "Unix epoch time")
+	assert.Equal(t, "Thu Jan  1 00:00:00 1970", f.Format("%c", epoch), "Unix epoch full datetime")
+
+	// Test year boundary transition
+	yearEnd := time.Date(2020, 12, 31, 23, 59, 59, 999999999, time.UTC)
+	yearStart := time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	assert.Equal(t, "2020-12-31 23:59:59", f.Format("%Y-%m-%d %H:%M:%S", yearEnd), "Year end")
+	assert.Equal(t, "2021-01-01 00:00:00", f.Format("%Y-%m-%d %H:%M:%S", yearStart), "Year start")
+
+	// Test very distant past and future dates
+	distantPast := time.Date(-100, 1, 1, 0, 0, 0, 0, time.UTC)
+	distantFuture := time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC)
+
+	assert.Equal(t, "-100", f.Format("%Y", distantPast), "Distant past year")
+	assert.Equal(t, "9999", f.Format("%Y", distantFuture), "Distant future year")
+}
+
+// TestLocaleDetection tests more complex locale detection scenarios
+func TestLocaleDetection(t *testing.T) {
+	ref := time.Unix(1136239445, 456841962).UTC()
+
+	// Test various locale detection patterns
+	localeTests := []struct {
+		name          string
+		acceptLang    string
+		expectedTag   language.Tag
+		expectedMonth string // %B for January
+		expectedDay   string // %A for Monday
+	}{
+		{"Simple English", "en", language.English, "January", "Monday"},
+		{"American English", "en-US", language.AmericanEnglish, "January", "Monday"},
+		{"British English", "en-GB", language.BritishEnglish, "January", "Monday"},
+		{"Simple German", "de", language.German, "Januar", "Montag"},
+		{"Quality Values", "fr;q=0.8, en;q=0.7", language.French, "janvier", "lundi"},
+		{"Multiple Locales with Quality", "es;q=0.5, it;q=0.9", language.Italian, "gennaio", "lunedì"},
+		// Note: actual behavior depends on the implementation of strftimeLocaleMatcher
+		// With the current implementation, it selects Spanish for the Brazilian Portuguese tag
+		{"Complex Chain", "pt-BR, es;q=0.8, en-US;q=0.6, en;q=0.4", language.Spanish, "enero", "lunes"},
+	}
+
+	for _, tc := range localeTests {
+		t.Run(tc.name, func(t *testing.T) {
+			tags, _, _ := language.ParseAcceptLanguage(tc.acceptLang)
+
+			// Create formatter with the parsed tags
+			f := strftime.New(tags...)
+
+			// Get actual formatted output
+			gotMonth := f.Format("%B", ref)
+			gotDay := f.Format("%A", ref)
+
+			// Compare against expected values
+			assert.Equal(t, tc.expectedMonth, gotMonth, "Month name should match expected locale")
+			assert.Equal(t, tc.expectedDay, gotDay, "Day name should match expected locale")
+		})
+	}
+}
+
+// TestFormatErrors tests improper format strings and edge cases
+func TestFormatErrors(t *testing.T) {
+	f := strftime.New(language.English)
+	ref := time.Unix(1136239445, 456841962).UTC()
+
+	// Test incomplete format specifiers
+	assert.Equal(t, "%", f.Format("%", ref), "Single % at end should remain as %")
+	assert.Equal(t, "Test % string", f.Format("Test % string", ref), "Single % in middle should remain as %")
+
+	// Test unknown format specifiers
+	assert.Equal(t, "Test %Q string", f.Format("Test %Q string", ref), "Unknown specifier %Q should remain as %Q")
+
+	// Test incomplete modifiers
+	assert.Equal(t, "Test %E string", f.Format("Test %E string", ref), "Incomplete %E should remain as %E")
+	assert.Equal(t, "Test %O string", f.Format("Test %O string", ref), "Incomplete %O should remain as %O")
+
+	// Test multiple consecutive % signs
+	assert.Equal(t, "Test % % % string", f.Format("Test % % % string", ref), "Multiple consecutive % should remain as is")
+	assert.Equal(t, "Test % string", f.Format("Test %% string", ref), "%% should produce a single %")
+	assert.Equal(t, "Test %% string", f.Format("Test %%% string", ref), "%%% should produce %% in the output")
 }
 
 func TestApi(t *testing.T) {
