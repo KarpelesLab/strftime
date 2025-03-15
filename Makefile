@@ -12,7 +12,7 @@ deps:
 	$(GOROOT)/bin/go get -v -t .
 
 bench:
-	$(GOROOT)/bin/go test -tags bench -benchmem -bench .
+	$(GOROOT)/bin/go test -v -benchmem -bench . ./benchmarks
 
 test:
 	$(GOROOT)/bin/go test -v ./...
