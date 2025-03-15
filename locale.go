@@ -1,3 +1,4 @@
+// Package strftime provides locale-aware time formatting.
 package strftime
 
 import (
@@ -6,39 +7,47 @@ import (
 	"golang.org/x/text/language"
 )
 
+// strftimeLocaleInfo holds all the locale-specific information needed for formatting times.
+// This includes translated day and month names, date format patterns, and special
+// formatting functions for different calendar systems.
 type strftimeLocaleInfo struct {
-	tag language.Tag
+	tag language.Tag // The language tag representing this locale
 
-	DTfmt  string // %c
-	Dfmt   string // %x
-	Tfmt   string // %X
-	Tfmt12 string //  with am/pm
+	DTfmt  string // DateTime format (%c)
+	Dfmt   string // Date format (%x)
+	Tfmt   string // Time format (%X)
+	Tfmt12 string // 12-hour time format with am/pm
 
-	// era-related stuff
-	DTfmtEra string // alternative %c
-	DfmtEra  string
-	TfmtEra  string
+	// Era-related formats for calendars with era-based years (like Japanese)
+	DTfmtEra string // Alternative DateTime format with era (%Ec)
+	DfmtEra  string // Alternative Date format with era (%Ex)
+	TfmtEra  string // Alternative Time format with era (%EX)
 
-	AmPm [2]string
+	AmPm [2]string // AM/PM indicators [0]=AM, [1]=PM
 
-	AbDay [7]string
-	Day   [7]string
+	AbDay [7]string // Abbreviated day names (Sun-Sat)
+	Day   [7]string // Full day names (Sunday-Saturday)
 
-	// functions for extended %O(x) and %E(x)
-	Oprint func([]byte, int) []byte
-	Eyear  func(time.Time, byte) string // byte can be 'C', 'y' or 'Y'
+	// Functions for extended formatting
+	Oprint func([]byte, int) []byte     // For %O format - alternative digits (e.g., Japanese numerals)
+	Eyear  func(time.Time, byte) string // For %E format - era-based year formatting (e.g., Japanese era)
+	// byte can be 'C' (century), 'y' (year) or 'Y' (full year)
 
-	AbMonth [12]string
-	Month   [12]string
+	AbMonth [12]string // Abbreviated month names (Jan-Dec)
+	Month   [12]string // Full month names (January-December)
 }
 
 var (
+	// strftimeLocaleMatcher is used to match requested language tags to available locales
 	strftimeLocaleMatcher language.Matcher
-	strftimeLocaleTable   map[language.Tag]*strftimeLocaleInfo
+
+	// strftimeLocaleTable provides fast lookup of locale information by language tag
+	strftimeLocaleTable map[language.Tag]*strftimeLocaleInfo
 )
 
+// init initializes the locale matcher and lookup table
 func init() {
-	// initialize and fill the variables
+	// Initialize and fill the variables
 	strftimeLocaleTable = make(map[language.Tag]*strftimeLocaleInfo)
 	matcherTable := make([]language.Tag, len(strftimeLocales))
 
@@ -47,9 +56,11 @@ func init() {
 		matcherTable[i] = loc.tag
 	}
 
+	// Create a matcher that can find the closest locale to a requested language
 	strftimeLocaleMatcher = language.NewMatcher(matcherTable)
 }
 
+// strftimeLocales contains all supported locales with their formatting information
 var strftimeLocales = [...]*strftimeLocaleInfo{
 	englishLocale,
 	americanEnglishLocale,

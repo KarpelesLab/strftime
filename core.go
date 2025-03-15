@@ -1,3 +1,4 @@
+// Package strftime implements C-like strftime functionality with locale support.
 package strftime
 
 import (
@@ -6,6 +7,69 @@ import (
 	"time"
 )
 
+// appendStrftime formats a time according to the specified format string and locale information,
+// appending the result to a byte slice.
+//
+// This is the core formatting function that processes the format string and applies the appropriate
+// formatting based on the conversion specifiers (% directives).
+//
+// Parameters:
+//   - l: Pointer to locale information for language-specific formatting
+//   - b: Byte slice to append formatted output to
+//   - f: Format string as bytes with strftime-style directives
+//   - t: Time value to format
+//
+// Returns: The extended byte slice with formatted time appended
+//
+// Supported format directives include:
+//   - %a - Abbreviated weekday name
+//   - %A - Full weekday name
+//   - %b - Abbreviated month name
+//   - %B - Full month name
+//   - %c - Preferred date and time representation
+//   - %C - Century (year/100)
+//   - %d - Day of month as decimal (01-31)
+//   - %D - Equivalent to %m/%d/%y
+//   - %e - Day of month as decimal with leading space (1-31)
+//   - %f - Microseconds
+//   - %F - Equivalent to %Y-%m-%d (ISO 8601)
+//   - %g - Last two digits of ISO week-based year
+//   - %G - ISO week-based year
+//   - %h - Same as %b
+//   - %H - Hour (00-23)
+//   - %I - Hour (01-12)
+//   - %j - Day of year (001-366)
+//   - %k - Hour with leading space (0-23)
+//   - %l - Hour with leading space (1-12)
+//   - %m - Month as decimal (01-12)
+//   - %M - Minute (00-59)
+//   - %n - Newline character
+//   - %p - AM or PM
+//   - %P - am or pm
+//   - %r - Time in 12-hour format with AM/PM
+//   - %R - Time in 24-hour format (%H:%M)
+//   - %s - Seconds since Unix epoch
+//   - %S - Second (00-60)
+//   - %t - Tab character
+//   - %T - Time in 24-hour format (%H:%M:%S)
+//   - %u - Weekday as decimal (1-7, Monday=1)
+//   - %U - Week number (00-53, Sunday as first day)
+//   - %v - Date in form of %e-%b-%Y
+//   - %V - ISO week number (01-53)
+//   - %w - Weekday as decimal (0-6, Sunday=0)
+//   - %W - Week number (00-53, Monday as first day)
+//   - %x - Preferred date representation
+//   - %X - Preferred time representation
+//   - %y - Year without century (00-99)
+//   - %Y - Year with century
+//   - %z - Time zone offset
+//   - %Z - Time zone name
+//   - %% - Percent sign
+//
+// Extended modifiers supported (before specifier):
+//   - %E - Alternative format (for date/time) - depends on locale, mainly used for era-based dates
+//   - %O - Alternative numeral format - depends on locale, mainly used for non-latin numerals
+//   - %- - No zero padding
 func appendStrftime(l *strftimeLocaleInfo, b []byte, f []byte, t time.Time) []byte {
 	var skip, i int
 
